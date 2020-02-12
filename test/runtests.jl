@@ -1,5 +1,6 @@
 using RMP
 using Test
+using DataFrames
 
 @testset "RMP.jl" begin
     # Write your own tests here.
@@ -17,4 +18,10 @@ end
     @test round.(transfNorm(x,x[1:3]), digits = 2)  == [-0.67, 0.0, 0.67, 1.35, 2.02]
     @test_throws MethodError transfNorm("str",x)
     @test_throws MethodError transfNorm(x,"str")
+end
+
+@testset "decorrelate" begin
+    X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
+    @test decorrelate(X) == [1,4]
+    @test decorrelate(X, orderCol = [3,1,2]) == [3]
 end
