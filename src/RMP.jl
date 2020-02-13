@@ -12,7 +12,7 @@ function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
     """Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
     prioritizing columns by a given order 'orderCol' (defaults to left to right).
     """
-    if isnothing(orderCol)
+    if orderCol === nothing
         orderCol = collect(1:size(data, 2))
     end
     # Columns to sort
