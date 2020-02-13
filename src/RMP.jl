@@ -1,5 +1,5 @@
 module RMP
-export transfLog, transfNorm, decorrelate
+export transfLog, transfNorm, decorrelate, mahalanobis
 using Statistics, StatsBase, DataFrames
 
 # Approximate normal distribution
@@ -36,5 +36,14 @@ function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
     end
     return(L2)
 end
+
+function mahalanobis(arrX::Vector{Float64}, µ::Vector{Float64}, S::Array{Float64,2})
+    """Squared mahalanobis distance for covariance estimator S and center µ"""
+    return((arrX - µ)'*inv(S)*(arrX - µ))
+end
+
+# Allows the computation to be mapped on rows of a DataFrame
+mahalanobis(x::DataFrameRow, µ::Vector{Float64}, S::Array{Float64,2}) = 
+    mahalanobis(convert(Vector, x), µ, S)
 
 end # module

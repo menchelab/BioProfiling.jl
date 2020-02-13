@@ -1,9 +1,21 @@
 using RMP
 using Test
 using DataFrames
+using LinearAlgebra: I
 
-@testset "RMP.jl" begin
-    # Write your own tests here.
+@testset "mahalanobis" begin
+    c = rand(5)
+    s = rand(5,5)
+	@test mahalanobis(c, c, s) == 0
+	function testpositivedefinite()
+		c = rand(5)
+		# The covariance matrix s is expected to be
+	    # a symmetric positive definite matrix
+	    s = rand(5,5)
+	    s = s*s' + I
+	    return(mahalanobis(c, c .+1, s) > 0)
+	end
+	@test all([testpositivedefinite() for x in 1:20])
 end
 
 @testset "transfLog" begin
