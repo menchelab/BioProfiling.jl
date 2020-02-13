@@ -1,7 +1,7 @@
 name = "RMP"
 uuid = "cef322dc-4d82-11ea-04a7-113231db804d"
 authors = ["Loan Vulliard <lvulliard@cemm.oeaw.ac.at>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
