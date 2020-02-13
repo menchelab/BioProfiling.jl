@@ -1,12 +1,12 @@
 module RMP
-export transfLog, transfNorm, decorrelate, mahalanobis
+export logtransform, normtransform, decorrelate, mahalanobis
 using Statistics, StatsBase, DataFrames
 
 # Approximate normal distribution
-transfLog(x) = log.(x .+ 1 .- minimum(x))
+logtransform(x) = log.(x .+ 1 .- minimum(x))
 
 # Center and scale on control values
-transfNorm(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
+normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 
 function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
     """Returns column  of 'data' that are never pairwise-correlated more than 'threshold',

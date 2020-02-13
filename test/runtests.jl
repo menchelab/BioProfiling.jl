@@ -18,18 +18,18 @@ using LinearAlgebra: I
 	@test all([testpositivedefinite() for x in 1:20])
 end
 
-@testset "transfLog" begin
-    @test transfLog(1) == 0
-    @test_throws MethodError transfLog("str")
-    @test round.(transfLog(1:5), digits=2) == [0.0, 0.69, 1.1, 1.39, 1.61]
+@testset "logtransform" begin
+    @test logtransform(1) == 0
+    @test_throws MethodError logtransform("str")
+    @test round.(logtransform(1:5), digits=2) == [0.0, 0.69, 1.1, 1.39, 1.61]
 end
 
-@testset "transfNorm" begin
+@testset "normtransform" begin
     x = 1:5
-	@test round.(transfNorm(x,x), digits = 2) == [-1.35, -0.67, 0.0, 0.67, 1.35]
-    @test round.(transfNorm(x,x[1:3]), digits = 2)  == [-0.67, 0.0, 0.67, 1.35, 2.02]
-    @test_throws MethodError transfNorm("str",x)
-    @test_throws MethodError transfNorm(x,"str")
+	@test round.(normtransform(x,x), digits = 2) == [-1.35, -0.67, 0.0, 0.67, 1.35]
+    @test round.(normtransform(x,x[1:3]), digits = 2)  == [-0.67, 0.0, 0.67, 1.35, 2.02]
+    @test_throws MethodError normtransform("str",x)
+    @test_throws MethodError normtransform(x,"str")
 end
 
 @testset "decorrelate" begin
