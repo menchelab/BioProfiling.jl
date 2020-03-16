@@ -1,6 +1,7 @@
 module RMP
-export logtransform, normtransform, decorrelate, mahalanobis
+export logtransform, normtransform, decorrelate, mahalanobis, hellinger
 using Statistics, StatsBase, DataFrames
+using LinearAlgebra: det
 
 # Approximate normal distribution
 logtransform(x) = log.(x .+ 1 .- minimum(x))
@@ -45,5 +46,14 @@ end
 # Allows the computation to be mapped on rows of a DataFrame
 mahalanobis(x::DataFrameRow, µ::Vector{Float64}, S::Array{Float64,2}) = 
     mahalanobis(convert(Vector, x), µ, S)
+
+function hellinger(µ1::Vector{Float64}, S1::Array{Float64,2}, 
+				   µ2::Vector{Float64}, S2::Array{Float64,2})
+    """Squared hellinger distance for covariance estimators S and centers µ"""
+    S = (S1 + S2)/2
+    H = 1 - (det(S1)^(1/4))*(det(S2)^(1/4))/(det(S)^(1/2))*
+    	exp((-1/8)*(µ1-µ2)'*inv(S)*(µ1-µ2))
+    return(H)
+end
 
 end # module

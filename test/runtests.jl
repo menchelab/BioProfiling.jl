@@ -2,8 +2,42 @@ using RMP
 using Test
 using DataFrames
 using LinearAlgebra: I
+using Random
+
+@testset "decorrelate" begin
+    X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
+    @test decorrelate(X) == [1,4]
+    @test decorrelate(X, orderCol = [3,1,2]) == [3]
+end
+
+@testset "hellinger" begin
+	Random.seed!(777)
+	# The covariance matrix s is expected to be
+    # a symmetric positive definite matrix
+    c = rand(5)
+    s = rand(5,5)
+    s = s*s' + I
+    # Distance of a distribution to itself should be zero, up to
+    # machine precision. NB: approximation includes relative term
+    # so isapprox(1e-200, 0) = false
+	@test hellinger(c, s, c, s) + 1 ≈ 1 
+	function testpositivedefinite()
+		c = rand(5)
+	    s = rand(5,5)
+	    s = s*s' + I
+	    return(hellinger(c, s, c .+1, s) > 0)
+	end
+	@test all([testpositivedefinite() for x in 1:20])
+end
+
+@testset "logtransform" begin
+    @test logtransform(1) == 0
+    @test_throws MethodError logtransform("str")
+    @test round.(logtransform(1:5), digits=2) == [0.0, 0.69, 1.1, 1.39, 1.61]
+end
 
 @testset "mahalanobis" begin
+	Random.seed!(777)
     c = rand(5)
     s = rand(5,5)
 	@test mahalanobis(c, c, s) == 0
@@ -18,22 +52,10 @@ using LinearAlgebra: I
 	@test all([testpositivedefinite() for x in 1:20])
 end
 
-@testset "logtransform" begin
-    @test logtransform(1) == 0
-    @test_throws MethodError logtransform("str")
-    @test round.(logtransform(1:5), digits=2) == [0.0, 0.69, 1.1, 1.39, 1.61]
-end
-
 @testset "normtransform" begin
     x = 1:5
 	@test round.(normtransform(x,x), digits = 2) == [-1.35, -0.67, 0.0, 0.67, 1.35]
     @test round.(normtransform(x,x[1:3]), digits = 2)  == [-0.67, 0.0, 0.67, 1.35, 2.02]
     @test_throws MethodError normtransform("str",x)
     @test_throws MethodError normtransform(x,"str")
-end
-
-@testset "decorrelate" begin
-    X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
-    @test decorrelate(X) == [1,4]
-    @test decorrelate(X, orderCol = [3,1,2]) == [3]
 end

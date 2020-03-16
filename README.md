@@ -26,7 +26,7 @@ Use the following to load this package:
 Use the following to install the package:
 
 	import Pkg
-	Pkg.add("https://github.com/menchelab/RMP.jl")
+	Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/RMP.jl.git"))
 
 Use can then use the package:
 
