@@ -9,10 +9,10 @@ logtransform(x) = log.(x .+ 1 .- minimum(x))
 # Center and scale on control values
 normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 
+"""Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
+   prioritizing columns by a given order 'orderCol' (defaults to left to right).
+"""
 function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
-    """Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
-    prioritizing columns by a given order 'orderCol' (defaults to left to right).
-    """
     if orderCol === nothing
         orderCol = collect(1:size(data, 2))
     end
@@ -38,18 +38,23 @@ function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
     return(L2)
 end
 
-function mahalanobis(arrX::Vector{Float64}, µ::Vector{Float64}, S::Array{Float64,2})
-    """Squared mahalanobis distance for covariance estimator S and center µ"""
+# Allows the computation to be mapped on  of a DataFrame
+decorrelate(data::AbstractMatrix; orderCol = nothing, threshold = 0.8) =
+	decorrelate(DataFrame(data), orderCol = orderCol, threshold = threshold)
+
+"""Squared mahalanobis distance for covariance estimator S and center µ"""
+function mahalanobis(arrX::AbstractVector{Float64}, 
+					 µ::AbstractVector{Float64}, S::AbstractArray{Float64,2})
     return((arrX - µ)'*inv(S)*(arrX - µ))
 end
 
 # Allows the computation to be mapped on rows of a DataFrame
-mahalanobis(x::DataFrameRow, µ::Vector{Float64}, S::Array{Float64,2}) = 
+mahalanobis(x::DataFrameRow, µ::AbstractVector{Float64}, S::AbstractArray{Float64,2}) = 
     mahalanobis(convert(Vector, x), µ, S)
 
-function hellinger(µ1::Vector{Float64}, S1::Array{Float64,2}, 
-				   µ2::Vector{Float64}, S2::Array{Float64,2})
-    """Squared hellinger distance for covariance estimators S and centers µ"""
+"""Squared hellinger distance for covariance estimators S and centers µ"""
+function hellinger(µ1::AbstractVector{Float64}, S1::AbstractArray{Float64,2}, 
+				   µ2::AbstractVector{Float64}, S2::AbstractArray{Float64,2})
     S = (S1 + S2)/2
     H = 1 - (det(S1)^(1/4))*(det(S2)^(1/4))/(det(S)^(1/2))*
     	exp((-1/8)*(µ1-µ2)'*inv(S)*(µ1-µ2))
