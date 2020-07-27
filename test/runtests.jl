@@ -1,6 +1,7 @@
 using RMP
 using Test
 using DataFrames
+using StatsBase
 using LinearAlgebra: I
 using Random
 
@@ -58,4 +59,30 @@ end
     @test round.(normtransform(x,x[1:3]), digits = 2)  == [-0.67, 0.0, 0.67, 1.35, 2.02]
     @test_throws MethodError normtransform("str",x)
     @test_throws MethodError normtransform(x,"str")
+end
+
+@testset "filterEntriesExperiment" begin
+	d1 = "Select only a single experiment"
+    f1 = Filter("Exp1", :Experiment, description = d1)
+	d2 = "Reject cells in high density regions"
+	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, comparison = isless, 
+	            description = d2)
+	@test f1.description == d1
+	@test f2.description == d2
+
+	# Define example dataset
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = RMP.Experiment(d)
+	@test e1.description == "No description provided"
+	@test e1.selectedEntries == 1:12
+
+	RMP.filterEntriesExperiment!(e1, f1)
+	@test e1.selectedEntries == [1,2,7,9,12]
+
+	RMP.filterEntriesExperiment!(e1, f2)
+	@test e1.selectedEntries == [7]
 end
