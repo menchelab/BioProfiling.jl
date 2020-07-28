@@ -76,13 +76,17 @@ end
 	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
 	d.Experiment = sample(["Exp1", "Exp2"], 12)
 
-	e1 = RMP.Experiment(d)
+	e1 = Experiment(d)
 	@test e1.description == "No description provided"
 	@test e1.selectedEntries == 1:12
 
-	RMP.filterEntriesExperiment!(e1, f1)
+	filterEntriesExperiment!(e1, f1)
 	@test e1.selectedEntries == [1,2,7,9,12]
 
-	RMP.filterEntriesExperiment!(e1, f2)
+	filterEntriesExperiment!(e1, f2)
 	@test e1.selectedEntries == [7]
+
+	e2 = Experiment(d)
+	filterEntriesExperiment!(e2, [f1,f2])
+	@test e2.selectedEntries == [7]
 end

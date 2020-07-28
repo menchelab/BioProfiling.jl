@@ -1,5 +1,5 @@
 module RMP
-export logtransform, normtransform, decorrelate, mahalanobis, hellinger, Filter, Experiment, filterEntriesExperiment
+export logtransform, normtransform, decorrelate, mahalanobis, hellinger, Filter, Experiment, filterEntriesExperiment!
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det
 
@@ -95,7 +95,7 @@ end
 
 # Methods
 
-"""Filter entries in an Experiment `e` based on filter `f`,
+"""Filter entries in an Experiment `e` based on filter(s) `f`,
 updating `e.selectedEntries` in place accordingly.
 """
 function filterEntriesExperiment!(e::AbstractExperiment, f::AbstractFilter)
@@ -103,5 +103,11 @@ function filterEntriesExperiment!(e::AbstractExperiment, f::AbstractFilter)
     e.selectedEntries = e.selectedEntries[f.comparison.(expEntries, f.value)]
 end
 
+
+function filterEntriesExperiment!(e::AbstractExperiment, filters::Array{T,1}) where {T<:AbstractFilter}
+    for f in filters
+        filterEntriesExperiment!(e, f)
+    end
+end
 
 end # module
