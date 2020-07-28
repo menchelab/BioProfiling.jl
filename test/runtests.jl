@@ -89,4 +89,16 @@ end
 	e2 = Experiment(d)
 	filterEntriesExperiment!(e2, [f1,f2])
 	@test e2.selectedEntries == [7]
+
+	e3 = Experiment(d)
+	f3 = Filter(0.8, :Ft1, comparison = >, description = "Large feature 1")
+	cf1 = CombinationFilter(f1,f2,intersect)
+	cf2 = CombinationFilter(cf1,f3,union)
+
+	@test filterEntriesExperiment(e3, cf1) == [7]
+	@test filterEntriesExperiment(e3, cf2) == [2,6,7,10]
+
+	# Additional checks that could be performed:
+	# Filter.comparison::Function -> Make sure it takes 2 arguments and return 1?
+	# CombinationFilter.operator::Function -> Make sure it takes 2 lists and return 1?
 end
