@@ -10,6 +10,7 @@ export  logtransform,
         filterEntriesExperiment!, 
         filterEntriesExperiment,
         Selector,
+        NameSelector,
         CombinationSelector,
         selectFeaturesExperiment,
         selectFeaturesExperiment!

@@ -139,4 +139,12 @@ end
 	@test selectFeaturesExperiment(e1, s1) == [1,2]
 	selectFeaturesExperiment!(e1, [s1, s2])
 	@test e1.selectedFeatures == [2]
+
+	strToRemove = ["MedianIntensity", "MorePatterns"]
+	s3 = NameSelector(x -> !any(occursin.(strToRemove, String(x))))
+	e2 = Experiment(d)
+	@test selectFeaturesExperiment(e2, s3) == [1,3]
+
+	selectFeaturesExperiment!(e2, [s1, s2, s3])
+	@test length(e2.selectedFeatures) == 0
 end

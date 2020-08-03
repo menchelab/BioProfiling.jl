@@ -84,6 +84,7 @@ end
 abstract type AbstractReduce end
 abstract type AbstractSelector <: AbstractReduce end
 abstract type AbstractSimpleSelector <: AbstractSelector end
+abstract type AbstractNameSelector <: AbstractSelector end
 abstract type AbstractCombinationSelector <: AbstractSelector end
 
 mutable struct Selector <: AbstractSimpleSelector
@@ -96,6 +97,16 @@ end
 function Selector(summarize; subset = nothing,
                   description = "No description provided")
     return Selector(summarize, subset, description)
+end
+
+mutable struct NameSelector <: AbstractNameSelector
+    summarize::Function
+    description::String
+end
+
+# Constructor
+function NameSelector(summarize; description = "No description provided")
+    return NameSelector(summarize, description)
 end
 
 mutable struct CombinationSelector <: AbstractCombinationSelector
@@ -115,14 +126,19 @@ function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractSimpleSelect
     else
         data = e.data[e.selectedEntries[s.subset], e.selectedFeatures]
     end
-    selectedFtDF = mapcols(x -> s.summarize(x), data)
+    selectedFtDF = mapcols(s.summarize, data)
     return(e.selectedFeatures[[x for x in selectedFtDF[1,:]]])
+end
+
+function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractNameSelector)
+    selectedFtDF = map(s.summarize, names(e.data[e.selectedFeatures]))
+    return(e.selectedFeatures[selectedFtDF])
 end
 
 """Return selected features in an Experiment `e` based on selectors `s`,
 updating `e.selectedFeatures` in place accordingly.
 """
-function selectFeaturesExperiment!(e::AbstractExperiment, s::AbstractSimpleSelector)
+function selectFeaturesExperiment!(e::AbstractExperiment, s::AbstractSelector)
     # Currently returns the indices kept
     e.selectedFeatures = selectFeaturesExperiment(e,s)
 end
@@ -132,3 +148,4 @@ function selectFeaturesExperiment!(e::AbstractExperiment, selectors::Array{T,1})
         selectFeaturesExperiment!(e, s)
     end
 end
+
