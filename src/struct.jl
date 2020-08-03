@@ -110,8 +110,8 @@ function NameSelector(summarize; description = "No description provided")
 end
 
 mutable struct CombinationSelector <: AbstractCombinationSelector
-    filter1::AbstractSelector
-    filter2::AbstractSelector
+    selector1::AbstractSelector
+    selector2::AbstractSelector
     operator::Function
 end
 
@@ -133,6 +133,12 @@ end
 function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractNameSelector)
     selectedFtDF = map(s.summarize, names(e.data[e.selectedFeatures]))
     return(e.selectedFeatures[selectedFtDF])
+end
+
+function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractCombinationSelector)
+    f1 = selectFeaturesExperiment(e, s.selector1)
+    f2 = selectFeaturesExperiment(e, s.selector2)
+    return(sort(s.operator(f1, f2)))
 end
 
 """Return selected features in an Experiment `e` based on selectors `s`,

@@ -147,4 +147,15 @@ end
 
 	selectFeaturesExperiment!(e2, [s1, s2, s3])
 	@test length(e2.selectedFeatures) == 0
+
+	e3 = Experiment(d)
+	s4 = deepcopy(s1)
+	# Inverse function: keeps textual features
+	s4.summarize = !s4.summarize
+	s5 = deepcopy(s3)
+	# Inverse function: keeps features including "MedianIntensity"
+	s5.summarize = !s5.summarize
+
+	cs1 = CombinationSelector(s4,s5,union)
+	@test selectFeaturesExperiment(e3, cs1) == [2,3]
 end
