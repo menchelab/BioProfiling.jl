@@ -155,3 +155,18 @@ function selectFeaturesExperiment!(e::AbstractExperiment, selectors::Array{T,1})
     end
 end
 
+"""For an experiment `e`, update in place `e.selectedFeatures` and 
+`e.selectedEntries` based on an array `arr` of feature selectors and 
+entry filters. Filters and selectors are applied sequentially.
+"""
+function filterExperiment!(e::AbstractExperiment, arr::Array{T,1}) where {T<:AbstractReduce}
+    for a in arr
+        filterExperiment!(e, a)
+    end
+end
+
+filterExperiment!(e::AbstractExperiment, s::AbstractSelector) = selectFeaturesExperiment!(e,s)
+filterExperiment!(e::AbstractExperiment, f::AbstractFilter) = filterEntriesExperiment!(e,f)
+
+selectExperiment! = filterExperiment!
+

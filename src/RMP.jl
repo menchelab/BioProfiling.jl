@@ -13,7 +13,9 @@ export  logtransform,
         NameSelector,
         CombinationSelector,
         selectFeaturesExperiment,
-        selectFeaturesExperiment!
+        selectFeaturesExperiment!,
+        selectExperiment!,
+        filterExperiment!
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det
 

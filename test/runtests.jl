@@ -159,3 +159,34 @@ end
 	cs1 = CombinationSelector(s4,s5,union)
 	@test selectFeaturesExperiment(e3, cs1) == [2,3]
 end
+
+@testset "filterExperiment!" begin
+    # Define example dataset
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+	# NB: throws a warning 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = Experiment(d)
+
+	# Create selectors
+	s1 = Selector(x -> !(eltype(x) <: Number),
+				  description = "Keep textual features")
+	keptPatterns = ["MedianIntensity", "MorePatterns"]
+	s2 = NameSelector(x -> any(occursin.(keptPatterns, String(x))),
+					  description = "Keep features including chosen patterns")
+	cs1 = CombinationSelector(s1,s2,union)
+
+	# Create filters
+	d1 = "Select only a single experiment"
+    f1 = Filter("Exp1", :Experiment, description = d1)
+	d2 = "Reject cells in high density regions"
+	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, compare = isless, 
+	            description = d2)
+
+	filterExperiment!(e1,[cs1,f1,f2])
+	@test length(e1.selectedFeatures) == 2
+	@test e1.selectedEntries == [7]
+end
