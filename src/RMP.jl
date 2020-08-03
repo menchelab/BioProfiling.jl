@@ -8,7 +8,11 @@ export  logtransform,
         CombinationFilter, 
         Experiment, 
         filterEntriesExperiment!, 
-        filterEntriesExperiment
+        filterEntriesExperiment,
+        Selector,
+        CombinationSelector,
+        selectFeaturesExperiment,
+        selectFeaturesExperiment!
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det
 

@@ -61,11 +61,26 @@ end
     @test_throws MethodError normtransform(x,"str")
 end
 
-@testset "filterEntriesExperiment" begin
+@testset "Experiment" begin
+	# Define example dataset
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = Experiment(d)
+	@test e1.description == "No description provided"
+	@test e1.selectedEntries == 1:12
+
+	# Additional checks that could be performed:
+	# Test print format
+end
+
+@testset "Filter" begin
 	d1 = "Select only a single experiment"
     f1 = Filter("Exp1", :Experiment, description = d1)
 	d2 = "Reject cells in high density regions"
-	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, comparison = isless, 
+	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, compare = isless, 
 	            description = d2)
 	@test f1.description == d1
 	@test f2.description == d2
@@ -73,12 +88,12 @@ end
 	# Define example dataset
 	Random.seed!(3895)
 	d = DataFrame(rand(12,2))
-	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	# NB: throws a warning 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
 	d.Experiment = sample(["Exp1", "Exp2"], 12)
 
 	e1 = Experiment(d)
-	@test e1.description == "No description provided"
-	@test e1.selectedEntries == 1:12
 
 	filterEntriesExperiment!(e1, f1)
 	@test e1.selectedEntries == [1,2,7,9,12]
@@ -91,7 +106,7 @@ end
 	@test e2.selectedEntries == [7]
 
 	e3 = Experiment(d)
-	f3 = Filter(0.8, :Ft1, comparison = >, description = "Large feature 1")
+	f3 = Filter(0.8, :Ft1, compare = >, description = "Large feature 1")
 	cf1 = CombinationFilter(f1,f2,intersect)
 	cf2 = CombinationFilter(cf1,f3,union)
 
@@ -99,6 +114,29 @@ end
 	@test filterEntriesExperiment(e3, cf2) == [2,6,7,10]
 
 	# Additional checks that could be performed:
-	# Filter.comparison::Function -> Make sure it takes 2 arguments and return 1?
+	# Filter.compare::Function -> Make sure it takes 2 arguments and return 1?
 	# CombinationFilter.operator::Function -> Make sure it takes 2 lists and return 1?
+end
+
+@testset "Selector" begin
+	# Define example dataset
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+	# NB: throws a warning 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = Experiment(d)
+
+	s1 = Selector(x -> eltype(x) <: Number)
+	s2 = Selector(x -> mean(x) > 0.5, subset = findall(d.Experiment .== "Exp1"),
+				  description = "High mean for Exp1")
+
+	@test s1.subset === nothing
+	@test s2.description == "High mean for Exp1"
+
+	@test selectFeaturesExperiment(e1, s1) == [1,2]
+	selectFeaturesExperiment!(e1, [s1, s2])
+	@test e1.selectedFeatures == [2]
 end
