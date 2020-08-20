@@ -130,7 +130,7 @@ end
 	e1 = Experiment(d)
 
 	s1 = Selector(x -> eltype(x) <: Number)
-	s2 = Selector(x -> mean(x) > 0.5, subset = findall(d.Experiment .== "Exp1"),
+	s2 = Selector(x -> mean(x) > 0.5, subset = x -> x.Experiment .== "Exp1",
 				  description = "High mean for Exp1")
 
 	@test s1.subset === nothing

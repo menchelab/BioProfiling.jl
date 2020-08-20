@@ -89,7 +89,7 @@ abstract type AbstractCombinationSelector <: AbstractSelector end
 
 mutable struct Selector <: AbstractSimpleSelector
     summarize::Function
-    subset::Union{Vector{Number}, Nothing}
+    subset::Union{Function, Nothing}
     description::String
 end
 
@@ -124,7 +124,8 @@ function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractSimpleSelect
     if s.subset === nothing
         data = e.data[e.selectedEntries, e.selectedFeatures]
     else
-        data = e.data[e.selectedEntries[s.subset], e.selectedFeatures]
+        subIndices = s.subset(e.data[e.selectedEntries,:])
+        data = e.data[e.selectedEntries[subIndices], e.selectedFeatures]
     end
     selectedFtDF = mapcols(s.summarize, data)
     return(e.selectedFeatures[[x for x in selectedFtDF[1,:]]])
