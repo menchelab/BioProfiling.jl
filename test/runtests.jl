@@ -190,3 +190,24 @@ end
 	@test length(e1.selectedFeatures) == 2
 	@test e1.selectedEntries == [7]
 end
+
+@testset "diagnostic" begin
+    # Define example dataset
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+	
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = Experiment(d)
+
+	d1 = "Select only a single experiment"
+	f1 = Filter("Exp1", :Experiment, description = d1)
+	d2 = "Reject cells in high density regions"
+	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, compare = isless, 
+	            description = d2)
+
+	cf1 = CombinationFilter(f1,f2,intersect)
+
+	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.056572675137066764)
+end

@@ -15,12 +15,14 @@ export  logtransform,
         selectFeaturesExperiment,
         selectFeaturesExperiment!,
         selectExperiment!,
-        filterExperiment!
+        filterExperiment!,
+        diagnostic
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det
 
 include("transform.jl")
 include("distances.jl")
 include("struct.jl")
+include("diagnostic.jl")
 
 end # module
