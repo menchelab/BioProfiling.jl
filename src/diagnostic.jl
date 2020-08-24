@@ -39,3 +39,19 @@ function diagnosticURLImage(e::Experiment,
         return((diagURL, map(x -> diagURLtoCenters[x], diagURL)))
     end
 end
+
+"""
+Return an (intensity-normalized) color image, given `R`, `G` and `B` the paths to
+3 single-channel images."""
+function getColorImage(R::String, G::String, B::String; normalize = true)
+    imgR = load(R);
+    imgG = load(G);
+    imgB = load(B);
+
+    if normalize
+        imgR ./= maximum(imgR)
+        imgG ./= maximum(imgG)
+        imgB ./= maximum(imgB)
+    end
+    colorview(RGB, imgR, imgG, imgB)
+end

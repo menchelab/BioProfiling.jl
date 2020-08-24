@@ -214,4 +214,5 @@ end
 	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.056572675137066764]
 	# Additional checks that could be performed:
 	# Centers of diagnosticURLImage
+	# getColorImage
 end
