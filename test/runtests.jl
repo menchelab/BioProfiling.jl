@@ -195,7 +195,7 @@ end
     # Define example dataset
 	Random.seed!(3895)
 	d = DataFrame(rand(12,2))
-	
+
 	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
 	d.Experiment = sample(["Exp1", "Exp2"], 12)
 
@@ -210,4 +210,8 @@ end
 	cf1 = CombinationFilter(f1,f2,intersect)
 
 	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.056572675137066764)
+
+	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.056572675137066764]
+	# Additional checks that could be performed:
+	# Centers of diagnosticURLImage
 end

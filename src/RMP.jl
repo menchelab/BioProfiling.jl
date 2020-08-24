@@ -16,7 +16,8 @@ export  logtransform,
         selectFeaturesExperiment!,
         selectExperiment!,
         filterExperiment!,
-        diagnostic
+        diagnostic,
+        diagnosticURLImage
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det
 
