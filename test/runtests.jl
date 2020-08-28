@@ -215,4 +215,5 @@ end
 	# Additional checks that could be performed:
 	# Centers of diagnosticURLImage
 	# getColorImage
+	# diagnosticImages
 end

@@ -18,6 +18,7 @@ export  logtransform,
         filterExperiment!,
         diagnostic,
         diagnosticURLImage,
+        diagnosticImages,
         getColorImage
 using Statistics, StatsBase, DataFrames
 using LinearAlgebra: det

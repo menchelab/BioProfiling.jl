@@ -65,11 +65,6 @@ function filterEntriesExperiment(e::AbstractExperiment, f::AbstractCombinationFi
     return(sort(f.operator(e1, e2)))
 end
 
-function filterEntriesExperiment(e::AbstractExperiment, filters::Array{T,1}) where {T<:AbstractFilter}
-    for f in filters
-        filterEntriesExperiment(e, f)
-    end
-end
 
 """Filter entries in an Experiment `e` based on filter(s) `f`,
 updating `e.selectedEntries` in place accordingly.
