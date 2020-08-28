@@ -20,7 +20,7 @@ export  logtransform,
         diagnosticURLImage,
         diagnosticImages,
         getColorImage
-using Statistics, StatsBase, DataFrames
+using Statistics, StatsBase, DataFrames, Images, ImageMagick
 using LinearAlgebra: det
 
 include("transform.jl")
