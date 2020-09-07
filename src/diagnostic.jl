@@ -49,6 +49,23 @@ function diagnosticURLImage(e::Experiment,
     end
 end
 
+"""[intended for internal use only]
+Return color image (handle merging of 3 channels if needed)
+"""
+function colimgifrgb(imgPath, rgb)
+	if rgb === nothing
+		# Images don't have to be merged (e.g. already RGB)
+    	return(load(imgPath))
+    else
+    	# Use the transformations provided in `rgb` to get a
+    	# color image
+    	imgR = reduce(replace, rgb[1], init=imgPath)
+    	imgG = reduce(replace, rgb[2], init=imgPath)
+    	imgB = reduce(replace, rgb[3], init=imgPath)
+    	return(getColorImage(imgR, imgG, imgB))
+    end
+end
+
 """Get images in an experiment `e` whose location is stored in feature `s` after filtering with filter `f`.
 Images will be saved at the `path` provided if `saveimages` is set to true.   
 If `center` is true, crosses will indicate the center of selected objects, 
@@ -59,6 +76,8 @@ Display up to `showlimit` images if `show` is true.
 If `rgx` provides a list of regex substitutions, it will be applied on all image paths 
 (which is useful if you're in a different file system or environment as the one described
 in the `Experiment`'s data).
+If `rgb` provides a list of 3 lists of regex substitutions, it will be applied to generate
+the path to 3 images 
 """
 function diagnosticImages(e::Experiment,
                           f::AbstractFilter,
@@ -68,6 +87,7 @@ function diagnosticImages(e::Experiment,
                           show = false,
                           center = false, 
                           showlimit::Int64 = 20, 
+                          rgb = nothing,
                           rgx = nothing)
 
     # Get addresses of images matching criteria
@@ -78,7 +98,7 @@ function diagnosticImages(e::Experiment,
     showcounter = 0
     if !center  
         for imgPath = imagesURL
-            colImg = load(imgPath)
+        	colImg = colimgifrgb(imgPath, rgb)
             if show & (showcounter < showlimit)
                 showcounter += 1
                 display(colImg)
@@ -86,13 +106,18 @@ function diagnosticImages(e::Experiment,
             if saveimages
                 mkpath(path)
                 save(string(path, split(imgPath, "/")[end]), colImg)
+            elseif showcounter >= showlimit | !show
+            	# Images are not displayed nor saved
+            	# so we can safely exit
+            	break
             end
         end
     else
         # We highlight the center of region of interests provided
         for (imgPath, imgCenters) = zip(imagesURL[1], imagesURL[2])
             # Combine them into a single image, display if required and save it
-            colImg = load(imgPath)
+            colImg = colimgifrgb(imgPath, rgb)
+
             # Add white crosses around each center
             for (x,y) = eachrow(imgCenters)
                 x += 1
@@ -107,13 +132,17 @@ function diagnosticImages(e::Experiment,
             if saveimages
                 mkpath(path)
                 save(string(path, split(imgPath, "/")[end]), colImg)
+            elseif showcounter >= showlimit | !show
+            	# Images are not displayed nor saved
+            	# so we can safely exit
+            	break
             end
         end
     end
     return true
 end
 
-"""
+"""[intended for internal use only]
 Return an (intensity-normalized) color image, given `R`, `G` and `B` the paths to
 3 single-channel images."""
 function getColorImage(R::String, G::String, B::String; normalize = true)

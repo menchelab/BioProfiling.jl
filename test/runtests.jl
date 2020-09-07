@@ -214,9 +214,11 @@ end
 	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.056572675137066764]
 	@test diagnosticURLImage(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
 
-	@test diagnosticImages(e1, cf1, :Experiment, rgx = [r".*" => s"test/example.png"], saveimages = false)
+	@test diagnosticImages(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
 	# Additional checks that could be performed:
 	# Centers of diagnosticURLImage
-	# getColorImage
+	# getColorImage [internal]
+	# colimgifrgb [internal]
+	# rgb parameters of diagnosticImages
 	# output of diagnosticImages
 end
