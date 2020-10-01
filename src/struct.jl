@@ -171,3 +171,23 @@ filterExperiment!(e::AbstractExperiment, f::AbstractFilter) = filterEntriesExper
 
 selectExperiment! = filterExperiment!
 
+
+"""Return a negative Filter or Selector by inverting 
+the entries or features that are kept and excluded.
+"""
+function negation(r::Union{AbstractNameSelector,AbstractSimpleSelector})
+    neg_r = deepcopy(r)
+    neg_r.summarize = !neg_r.summarize
+    neg_r.description = "Do not "*neg_r.description
+    return(neg_r)
+end
+
+function negation(r::AbstractSimpleFilter)
+    neg_r = deepcopy(r)
+    neg_r.compare = !neg_r.compare
+    neg_r.description = "Do not "*neg_r.description
+    return(neg_r)
+end
+
+
+

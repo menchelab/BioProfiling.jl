@@ -18,7 +18,8 @@ export  logtransform,
         filterExperiment!,
         diagnostic,
         diagnosticURLImage,
-        diagnosticImages
+        diagnosticImages,
+        negation
 using Statistics, StatsBase, DataFrames, Images, ImageMagick
 using LinearAlgebra: det
 

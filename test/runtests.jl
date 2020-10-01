@@ -222,3 +222,46 @@ end
 	# rgb parameters of diagnosticImages
 	# output of diagnosticImages
 end
+
+@testset "negation" begin
+	Random.seed!(3895)
+	d = DataFrame(rand(12,2))
+
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = sample(["Exp1", "Exp2"], 12)
+
+	e1 = Experiment(d)
+
+	# Test negation of simple filter
+	d1 = "Select only a single experiment"
+	f1 = Filter("Exp1", :Experiment, description = d1)
+	nf1 = negation(f1)
+
+	@test nf1.description == "Do not "*f1.description
+	@test all(e1.data.Experiment[filterEntriesExperiment(e1, f1)] .== "Exp1")
+	@test all(e1.data.Experiment[filterEntriesExperiment(e1, nf1)] .== "Exp2")
+
+	# Test negation of simple selector
+	s1 = Selector(x -> eltype(x) <: Number, description = "Keep numeric features")
+	ns1 = negation(s1)
+
+	@test ns1.description == "Do not "*s1.description
+
+	ft_ns1 = selectFeaturesExperiment(e1, ns1)
+	@test ft_ns1 == [3]
+	# The union of the columns selected by a selector and its negation should be the set of all columns
+	append!(ft_ns1, selectFeaturesExperiment(e1, s1))
+	@test Set(ft_ns1) == Set(1:ncol(e1.data))
+
+    # Test negation of name selector
+	s2 = NameSelector(x -> occursin("Ft1", String(x)), "Keep Ft1")
+	ns2 = negation(s2)
+
+	@test ns2.description == "Do not "*s2.description
+
+	ft_ns2 = selectFeaturesExperiment(e1, ns2)
+	@test ft_ns2 == [2,3]
+	# The union of the columns selected by a selector and its negation should be the set of all columns
+	append!(ft_ns2, selectFeaturesExperiment(e1, s2))
+	@test Set(ft_ns2) == Set(1:ncol(e1.data))
+end
