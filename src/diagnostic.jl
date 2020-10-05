@@ -66,8 +66,21 @@ function colimgifrgb(imgPath, rgb)
     end
 end
 
+"""[intended for internal use only]
+Assemble output file name for a given path and folder structure
+"""
+function outimgpath(imgpath, basepath, keepsubfolders)
+	name_ending = join(split(imgpath, "/")[end-keepsubfolders:end], "/")
+	name = string(basepath, name_ending)
+	name_folder = join(split(name, "/")[1:end-1], "/")
+	mkpath(name_folder)
+	return(string(basepath, name_ending))
+end
+
+
 """Get images in an experiment `e` whose location is stored in feature `s` after filtering with filter `f`.
-Images will be saved at the `path` provided if `saveimages` is set to true.   
+Images will be saved at the `path` provided if `saveimages` is set to true, 
+while keeping up to `keepsubfolders` folders from the original folder structure of the images. 
 If `center` is true, crosses will indicate the center of selected objects, 
 assuming they are stored in variables `:AreaShape_Center_X`, `:AreaShape_Center_X_1`, 
 `:AreaShape_Center_Y` and `:AreaShape_Center_Y_1` (default if you merge nuclear and cytoplasm 
@@ -77,7 +90,7 @@ If `rgx` provides a list of regex substitutions, it will be applied on all image
 (which is useful if you're in a different file system or environment as the one described
 in the `Experiment`'s data).
 If `rgb` provides a list of 3 lists of regex substitutions, it will be applied to generate
-the path to 3 images 
+the path to 3 images.
 """
 function diagnosticImages(e::Experiment,
                           f::AbstractFilter,
@@ -88,7 +101,8 @@ function diagnosticImages(e::Experiment,
                           center = false, 
                           showlimit::Int64 = 20, 
                           rgb = nothing,
-                          rgx = nothing)
+                          rgx = nothing,
+                          keepsubfolders = 0)
 
     # Get addresses of images matching criteria
     imagesURL = diagnosticURLImage(e, f, s; center = center, rgx = rgx)
@@ -104,8 +118,7 @@ function diagnosticImages(e::Experiment,
                 display(colImg)
             end
             if saveimages
-                mkpath(path)
-                save(string(path, split(imgPath, "/")[end]), colImg)
+            	save(outimgpath(imgPath, path, keepsubfolders), colImg)
             elseif showcounter >= showlimit | !show
             	# Images are not displayed nor saved
             	# so we can safely exit
@@ -130,8 +143,7 @@ function diagnosticImages(e::Experiment,
                 display(colImg)
             end
             if saveimages
-                mkpath(path)
-                save(string(path, split(imgPath, "/")[end]), colImg)
+            	save(outimgpath(imgPath, path, keepsubfolders), colImg)
             elseif showcounter >= showlimit | !show
             	# Images are not displayed nor saved
             	# so we can safely exit
