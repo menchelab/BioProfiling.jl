@@ -265,3 +265,28 @@ end
 	append!(ft_ns2, selectFeaturesExperiment(e1, s2))
 	@test Set(ft_ns2) == Set(1:ncol(e1.data))
 end
+
+@testset "getdata" begin
+    # Here we test whether we can access the data filtered
+    # and use it for helper functions
+
+    # Generate test data
+	d = DataFrame(rand(12,2))
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	d.Experiment = repeat(["Exp1", "Exp2"], 6)
+
+	e1 = Experiment(d)
+
+	# Filter data
+	d1 = "Select only a single experiment"
+	f1 = Filter("Exp1", :Experiment, description = d1)
+	s1 = Selector(x -> eltype(x) <: Number,
+	              description = "Keep numerical features")
+
+	filterExperiment!(e1,[f1,s1])
+
+	# Test `getdata`
+	@test length(e1.selectedFeatures) == 2
+	@test length(e1.selectedEntries) == 6
+	@test RMP.getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
+end

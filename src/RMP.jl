@@ -19,7 +19,8 @@ export  logtransform,
         diagnostic,
         diagnosticURLImage,
         diagnosticImages,
-        negation
+        negation,
+        getdata
 using Statistics, StatsBase, DataFrames, Images, ImageMagick
 using LinearAlgebra: det
 

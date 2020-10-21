@@ -189,5 +189,10 @@ function negation(r::AbstractSimpleFilter)
     return(neg_r)
 end
 
+"""Return the data in Experiment `e` for its selected entries and features
+"""
+function getdata(e::Experiment)
+    return(e.data[e.selectedEntries, e.selectedFeatures])
+end
 
 
