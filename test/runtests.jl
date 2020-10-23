@@ -1,6 +1,7 @@
 using RMP
 using Test
 using DataFrames
+using Statistics
 using StatsBase
 using LinearAlgebra: I
 using Random
@@ -351,6 +352,14 @@ end
 	filterExperiment!(e4,[f1,s1])
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
-	@test 4 in e4.selectedFeatures
+	@test 5 in e4.selectedFeatures
+	if cor(getdata(e4).Ft4, getdata(e4).Ft3) < 0.8
+		@test 4 in e4.selectedFeatures
+	end
 	@test !(1 in e4.selectedFeatures)
+
+	# Test sorting by mad
+	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
+	decorrelate_by_mad!(e5)
+	@test e5.selectedFeatures == [3]
 end

@@ -60,11 +60,25 @@ end
 decorrelate(data::AbstractMatrix; ordercol = nothing, threshold = 0.8) =
 	decorrelate(DataFrame(data), ordercol = ordercol, threshold = threshold)
 
-"""Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
-   prioritizing columns by a given order 'orderCol' (defaults to left to right).
+"""Returns column  of selected data in Experiment `e` that are never 
+    pairwise-correlated more than 'threshold', prioritizing columns by 
+    a given order 'ordercol' (defaults to left to right).
 """
 function decorrelate!(e::Experiment; ordercol = nothing, threshold = 0.8)
     e.selectedFeatures = e.selectedFeatures[decorrelate(getdata(e), 
                                                         ordercol=ordercol,
                                                         threshold=threshold)]
+end
+
+"""Returns column  of selected data in Experiment `e` that are never 
+    pairwise-correlated more than 'threshold', prioritizing columns 
+    with largest median absolute deviation.
+"""
+function decorrelate_by_mad!(e::Experiment; threshold = 0.8)
+    # Order features from biggest mad to smallest mad
+    # When features have mad(reference) = 1, it means that we rank features 
+    # by how more variable they are overall compared to the reference
+    order_features = sortperm(convert(Array, map(x -> mad(x, normalize = true), 
+                     eachcol(getdata(e)))), rev=true);
+    decorrelate!(e, ordercol = order_features, threshold = threshold)
 end
