@@ -9,6 +9,8 @@ mutable struct Experiment <: AbstractExperiment
 end
 
 # Constructor
+# WARNING: data is not copied so any transformation of the Experiment's data
+# will modify the original `data` DataFrame fed to the constructor. 
 function Experiment(data; description = "No description provided")
     return Experiment(data, description, 1:ncol(data), 1:nrow(data))
 end

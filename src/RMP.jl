@@ -1,5 +1,6 @@
 module RMP
-export  logtransform, 
+export  logtransform,
+        logtransform!,
         normtransform, 
         decorrelate, 
         mahalanobis, 
@@ -24,9 +25,9 @@ export  logtransform,
 using Statistics, StatsBase, DataFrames, Images, ImageMagick
 using LinearAlgebra: det
 
+include("struct.jl")
 include("transform.jl")
 include("distances.jl")
-include("struct.jl")
 include("diagnostic.jl")
 
 end # module

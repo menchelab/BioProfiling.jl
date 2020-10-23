@@ -289,4 +289,18 @@ end
 	@test length(e1.selectedFeatures) == 2
 	@test length(e1.selectedEntries) == 6
 	@test RMP.getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
+
+	# Test `logtransform`
+
+	# Keep track of original values
+	d_copy = copy(getdata(e1))
+	e2 = deepcopy(e1)
+
+	logtransform!(e1)
+
+	# Check the transformation of one column
+	@test getdata(e1).Ft1 == d_copy.Ft1 |> x -> log.(1 .+ x .- minimum(x))
+	# Check that the original data is modified but not the copy
+	@test getdata(e1).Ft1 == d.Ft1[(1:6)*2 .- 1]
+	@test getdata(e2) == d_copy
 end

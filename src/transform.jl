@@ -1,6 +1,15 @@
 """Approximate normal distribution"""
 logtransform(x) = log.(x .+ 1 .- minimum(x))
 
+function logtransform!(e::Experiment)
+    e.data[e.selectedEntries, e.selectedFeatures] .= e |>
+                                                     getdata |>    
+                                                     eachcol |>    
+                                                     x -> map(logtransform, x) |>  
+                                                     x -> hcat(x...)
+end
+     
+
 """Center and scale on control values"""
 normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 
