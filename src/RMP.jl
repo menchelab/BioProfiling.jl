@@ -2,6 +2,7 @@ module RMP
 export  logtransform,
         logtransform!,
         normtransform, 
+        normtransform!, 
         decorrelate, 
         mahalanobis, 
         hellinger, 

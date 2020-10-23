@@ -196,5 +196,3 @@ end
 function getdata(e::Experiment)
     return(e.data[e.selectedEntries, e.selectedFeatures])
 end
-
-

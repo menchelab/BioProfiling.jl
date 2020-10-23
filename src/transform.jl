@@ -1,6 +1,9 @@
 """Approximate normal distribution"""
 logtransform(x) = log.(x .+ 1 .- minimum(x))
 
+"""Approximate normal distribution of selected entries 
+for all selected features of an Experiment `e`.
+"""
 function logtransform!(e::Experiment)
     e.data[e.selectedEntries, e.selectedFeatures] .= e |>
                                                      getdata |>    
@@ -8,10 +11,21 @@ function logtransform!(e::Experiment)
                                                      x -> map(logtransform, x) |>  
                                                      x -> hcat(x...)
 end
-     
 
 """Center and scale on control values"""
 normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
+
+"""Center and scale all selected entries for each selectead features
+of an Experiment `e` on control values matching a Filter `f`
+"""
+function normtransform!(e::Experiment, f::RMP.AbstractFilter)
+    f_col = filterEntriesExperiment(e,f)
+    e.data[e.selectedEntries, e.selectedFeatures] .= e.data[:, e.selectedFeatures] |>
+                                                     eachcol |>
+                                                     x -> map(y -> normtransform(y[e.selectedEntries],
+                                                                                 y[f_col]), x) |>
+                                                     x -> hcat(x...)    
+end
 
 """Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
    prioritizing columns by a given order 'orderCol' (defaults to left to right).

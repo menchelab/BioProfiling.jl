@@ -303,4 +303,26 @@ end
 	# Check that the original data is modified but not the copy
 	@test getdata(e1).Ft1 == d.Ft1[(1:6)*2 .- 1]
 	@test getdata(e2) == d_copy
+
+
+	# Test `normtransform`
+
+	# Keep track of original values
+	e3 = deepcopy(e2)
+
+	thr = sort(getdata(e2).Intensity_MedianIntensity_NeurDensity)[end-2]
+	f2 = Filter(thr, :Intensity_MedianIntensity_NeurDensity, 
+	       compare = >=, description = "Top 3 values")
+
+	normtransform!(e2,f2)
+
+	# Must include at least one 0 per column (centered on median of a subset of entries)
+	for c in eachcol(getdata(e2))
+		@test 0 in c
+	end
+	# At most 1 value > 0 (after substracting median of top 3 values)
+	@test sum(getdata(e2).Intensity_MedianIntensity_NeurDensity .> 0) <= 1
+	# Check that the original data is modified but not the copy
+	@test getdata(e3) != getdata(e2)
+	@test getdata(e3) == d_copy
 end
