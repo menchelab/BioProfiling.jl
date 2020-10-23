@@ -8,7 +8,7 @@ using Random
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
     @test decorrelate(X) == [1,4]
-    @test decorrelate(X, orderCol = [3,1,2]) == [3]
+    @test decorrelate(X, ordercol = [3,1,2]) == [3]
 end
 
 @testset "hellinger" begin
@@ -325,4 +325,32 @@ end
 	# Check that the original data is modified but not the copy
 	@test getdata(e3) != getdata(e2)
 	@test getdata(e3) == d_copy
+
+	# Test `decorrelate`
+
+	# Add correlated columns
+	d.Ft3 = -d.Ft1
+	d.Ft4 = copy(d.Intensity_MedianIntensity_NeurDensity)
+	d.Ft4[1] = 1
+	d.Intensity_MedianIntensity_NeurDensity[1] = 0
+
+	e4 = Experiment(d)
+	filterExperiment!(e4,[f1,s1])
+	decorrelate!(e4)
+	# First column always kept, inverse column removed
+	@test 1 in e4.selectedFeatures
+	@test !(4 in e4.selectedFeatures)
+
+	e4 = Experiment(d)
+	filterExperiment!(e4,[f1,s1])
+	decorrelate!(e4, threshold = 1)
+	# Not perfectly correlated by design
+	@test 5 in e4.selectedFeatures
+
+	e4 = Experiment(d)
+	filterExperiment!(e4,[f1,s1])
+	decorrelate!(e4, ordercol = [4,3,2,1])
+	# Reversed order: first column always kept, inverse column removed
+	@test 4 in e4.selectedFeatures
+	@test !(1 in e4.selectedFeatures)
 end

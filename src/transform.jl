@@ -18,7 +18,7 @@ normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 """Center and scale all selected entries for each selectead features
 of an Experiment `e` on control values matching a Filter `f`
 """
-function normtransform!(e::Experiment, f::RMP.AbstractFilter)
+function normtransform!(e::Experiment, f::AbstractFilter)
     f_col = filterEntriesExperiment(e,f)
     e.data[e.selectedEntries, e.selectedFeatures] .= e.data[:, e.selectedFeatures] |>
                                                      eachcol |>
@@ -28,14 +28,14 @@ function normtransform!(e::Experiment, f::RMP.AbstractFilter)
 end
 
 """Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
-   prioritizing columns by a given order 'orderCol' (defaults to left to right).
+   prioritizing columns by a given order 'ordercol' (defaults to left to right).
 """
-function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
-    if orderCol === nothing
-        orderCol = collect(1:size(data, 2))
+function decorrelate(data::DataFrame; ordercol = nothing, threshold = 0.8)
+    if ordercol === nothing
+        ordercol = collect(1:size(data, 2))
     end
     # Columns to sort
-    L1 = copy(orderCol) # Copy to avoid modifying the input list
+    L1 = copy(ordercol) # Copy to avoid modifying the input list
     # Sorted columns to keep
     L2 = Array{Int64,1}() 
     while length(L1) > 0
@@ -56,6 +56,15 @@ function decorrelate(data::DataFrame; orderCol = nothing, threshold = 0.8)
     return(L2)
 end
 
-# Allows the computation to be mapped on  of a DataFrame
-decorrelate(data::AbstractMatrix; orderCol = nothing, threshold = 0.8) =
-	decorrelate(DataFrame(data), orderCol = orderCol, threshold = threshold)
+# Allows the computation to be mapped on columns of a DataFrame
+decorrelate(data::AbstractMatrix; ordercol = nothing, threshold = 0.8) =
+	decorrelate(DataFrame(data), ordercol = ordercol, threshold = threshold)
+
+"""Returns column  of 'data' that are never pairwise-correlated more than 'threshold',
+   prioritizing columns by a given order 'orderCol' (defaults to left to right).
+"""
+function decorrelate!(e::Experiment; ordercol = nothing, threshold = 0.8)
+    e.selectedFeatures = e.selectedFeatures[decorrelate(getdata(e), 
+                                                        ordercol=ordercol,
+                                                        threshold=threshold)]
+end
