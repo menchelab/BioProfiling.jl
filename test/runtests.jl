@@ -64,10 +64,16 @@ end
 
 @testset "Experiment" begin
 	# Define example dataset
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
 
 	e1 = Experiment(d)
 	@test e1.description == "No description provided"
@@ -87,12 +93,17 @@ end
 	@test f2.description == d2
 
 	# Define example dataset
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
-	# NB: throws a warning 1.0 suggesting to use rename! instead
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
 	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
+
 
 	e1 = Experiment(d)
 
@@ -121,12 +132,17 @@ end
 
 @testset "Selector" begin
 	# Define example dataset
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
-	# NB: throws a warning 1.0 suggesting to use rename! instead
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
 	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
+
 
 	e1 = Experiment(d)
 
@@ -163,12 +179,17 @@ end
 
 @testset "filterExperiment!" begin
     # Define example dataset
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
-	# NB: throws a warning 1.0 suggesting to use rename! instead
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
 	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
+
 
 	e1 = Experiment(d)
 
@@ -194,11 +215,17 @@ end
 
 @testset "diagnostic" begin
     # Define example dataset
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
 
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
 
 	e1 = Experiment(d)
 
@@ -210,9 +237,9 @@ end
 
 	cf1 = CombinationFilter(f1,f2,intersect)
 
-	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.056572675137066764)
+	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.0565727)
 
-	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.056572675137066764]
+	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.0565727]
 	@test diagnosticURLImage(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
 
 	@test diagnosticImages(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
@@ -225,11 +252,18 @@ end
 end
 
 @testset "negation" begin
-	Random.seed!(3895)
-	d = DataFrame(rand(12,2))
+	# Define example dataset
+	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
+	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
+	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
+	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
+	# NB: throws a warning in 1.0 suggesting to use rename! instead
+	# Yet rename! only accepts pairs of symbols in late 1.x versions
+	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	d.Ft1 = convert.(Float64, d.Ft1)
+	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
+	d.Experiment = convert.(String, d.Experiment)
 
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
-	d.Experiment = sample(["Exp1", "Exp2"], 12)
 
 	e1 = Experiment(d)
 
