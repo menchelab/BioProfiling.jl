@@ -1,4 +1,4 @@
-using RMP
+using BioProfiling
 using Test
 using DataFrames
 using Statistics
@@ -323,7 +323,7 @@ end
 	# Test `getdata`
 	@test length(e1.selectedFeatures) == 2
 	@test length(e1.selectedEntries) == 6
-	@test RMP.getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
+	@test getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
 
 	# Test `logtransform`
 

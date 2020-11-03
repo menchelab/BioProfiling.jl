@@ -1,4 +1,4 @@
-module RMP
+module BioProfiling
 export  logtransform,
         logtransform!,
         normtransform, 

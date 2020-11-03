@@ -1,13 +1,14 @@
-# RMP.jl
+# BioProfiling.jl
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/menchelab/RMP.jl/blob/master/LICENSE)
 
-Robust multidimensional profiling to quantify complex changes via the minimum covariance determinant.
+Multidimensional profiling tools to quantify complex biological changes via robust statistical distances. Particularly suitable for morphological profiling on high-content imaging data.
+ 
 ---
 
 ## Disclaimer
 
-This package is under active development and is not intended for external use yet. Test at your own risk.
+This package is under active development and comes with no guarantee. Proceed with care
 
 ## Introduction
 
@@ -21,7 +22,7 @@ Use the following to load this package:
 
 	import Pkg
 	Pkg.activate(<pathToThisFolder>)
-	using RMP
+	using BioProfiling
 	Pkg.activate()
 
 ### Installation from GitHub

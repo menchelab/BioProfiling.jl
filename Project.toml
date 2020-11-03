@@ -1,4 +1,4 @@
-name = "RMP"
+name = "BioProfiling"
 uuid = "cef322dc-4d82-11ea-04a7-113231db804d"
 authors = ["Loan Vulliard <lvulliard@cemm.oeaw.ac.at>"]
 version = "0.3.3"
