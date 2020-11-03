@@ -30,11 +30,11 @@ Use the following to load this package:
 Use the following to install the package:
 
 	import Pkg
-	Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/RMP.jl.git"))
+	Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/RMP.jl.git", rev="Renaming"))
 
 Use can then use the package:
 
-	using RMP
+	using BioProfiling
 
 ## Credits
 
