@@ -397,3 +397,21 @@ end
 	decorrelate_by_mad!(e5)
 	@test e5.selectedFeatures == [3]
 end
+
+@testset "umap" begin
+    # Create dataset with 4 random and 1 index column
+    d = DataFrame(rand(40,4))
+	names!(d, Symbol.("Ft" .* string.(1:4)))
+	d.Ft5 = 1:40;
+	e = Experiment(d)
+
+	# Set filters
+	f = Filter(10, :Ft5, compare = >)
+	s = negation(NameSelector(x -> occursin("Ft3", x)))
+	filterExperiment!(e,[f,s])
+
+	# Test dimensions and arguments
+	@test size(umap(e)) == (2, 30)
+	@test size(umap(e, 3, n_neighbors = 10, min_dist = 1, n_epochs = 10)) == (3, 30)
+	@test_throws ArgumentError size(umap(e, 4))
+end

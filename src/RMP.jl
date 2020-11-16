@@ -24,13 +24,15 @@ export  logtransform,
         diagnosticURLImage,
         diagnosticImages,
         negation,
-        getdata
-using Statistics, StatsBase, DataFrames, Images, ImageMagick
+        getdata, 
+        umap
+using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP
 using LinearAlgebra: det
 
 include("struct.jl")
 include("transform.jl")
 include("distances.jl")
 include("diagnostic.jl")
+include("visu.jl")
 
 end # module
