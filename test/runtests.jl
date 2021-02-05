@@ -68,9 +68,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -97,9 +95,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -136,9 +132,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -183,9 +178,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -219,9 +212,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -257,9 +249,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -307,7 +298,7 @@ end
 
     # Generate test data
 	d = DataFrame(rand(12,2))
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
 	d.Experiment = repeat(["Exp1", "Exp2"], 6)
 
 	e1 = Experiment(d)
@@ -401,13 +392,13 @@ end
 @testset "umap" begin
     # Create dataset with 4 random and 1 index column
     d = DataFrame(rand(40,4))
-	names!(d, Symbol.("Ft" .* string.(1:4)))
+	rename!(d, Symbol.("Ft" .* string.(1:4)))
 	d.Ft5 = 1:40;
 	e = Experiment(d)
 
 	# Set filters
 	f = Filter(10, :Ft5, compare = >)
-	s = negation(NameSelector(x -> occursin("Ft3", x)))
+	s = negation(NameSelector(x -> occursin("Ft3", string(x))))
 	filterExperiment!(e,[f,s])
 
 	# Test dimensions and arguments
