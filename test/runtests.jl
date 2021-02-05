@@ -5,6 +5,7 @@ using Statistics
 using StatsBase
 using LinearAlgebra: I
 using Random
+using RCall
 
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
@@ -20,7 +21,7 @@ end
     s = rand(5,5)
     s = s*s' + I
     # Distance of a distribution to itself should be zero, up to
-    # machine precision. NB: approximation includes relative term
+    # machine precision. Note: approximation includes relative term
     # so isapprox(1e-200, 0) = false
 	@test hellinger(c, s, c, s) + 1 ≈ 1 
 	function testpositivedefinite()
@@ -405,4 +406,90 @@ end
 	@test size(umap(e)) == (2, 30)
 	@test size(umap(e, 3, n_neighbors = 10, min_dist = 1, n_epochs = 10)) == (3, 30)
 	@test_throws ArgumentError size(umap(e, 4))
+end
+
+@testset "biaseddistances" begin
+	# We want significantly more points than dimensions or the covariance
+	# matrix can be singular and the results would not make any sense
+	d = rand(100,5)
+	@test distance_mahalanobis_center(d, 1:50, 1:50) + 1 ≈ 1
+	
+	d = hcat(d, (1:100)./50)
+	# If some points are share with reference, the distance should be
+	# smaller than to a set of completely different points
+	dist1 = distance_mahalanobis_center(d, 51:100, 1:50)
+	dist2 = distance_mahalanobis_center(d, 25:74, 1:50)
+	@test dist1 > 0
+	@test dist2 > 0
+	@test dist1 > dist2
+	
+	dist0 = distance_mahalanobis_median(d, 1:50, 1:50)
+	dist1 = distance_mahalanobis_median(d, 25:74, 1:50)
+	dist2 = distance_mahalanobis_median(d, 51:100, 1:50)
+	@test 0 < dist0 < dist1 < dist2
+
+	# Testing permutation tests:
+	# If both ref and pert are sampled from the same distribution,
+	# p-value must be high.
+	# If ref and pert are sampled from non-overlapping distributions,
+	# p-value must be 0.
+	d = rand(100,5)
+	params = (d, 51:100, 1:50)
+	@test 0 < mean(shuffled_distance_mahalanobis_center(params...) .< 
+	               distance_mahalanobis_center(params...)) < 1
+	@test 0 < mean(shuffled_distance_mahalanobis_median(params...) .< 
+	               distance_mahalanobis_median(params...)) < 1
+
+	d[51:100, :] .+= 2
+	@test mean(shuffled_distance_mahalanobis_center(params...) .< 
+	           distance_mahalanobis_center(params...)) == 1
+	@test mean(shuffled_distance_mahalanobis_median(params...) .< 
+	           distance_mahalanobis_median(params...)) == 1
+end
+
+@testset "robustdistances" begin
+	# First, RCall must be running correctly
+	@test_throws RCall.REvalError R"""
+	library(NotALibrary)
+	"""
+
+	# Robustbase must be installed
+	R"""
+	if (!require("robustbase")) install.packages("robustbase", 
+												  repos = "https://cloud.r-project.org")
+	library(robustbase)
+	"""
+	d = rand(100,5)
+	@test distance_robust_hellinger(d, 1:50, 1:50) + 1 ≈ 1
+	
+	d = hcat(d, (1:100)./50)
+	# If some points are share with reference, the distance should be
+	# smaller than to a set of completely different points
+	dist0 = distance_robust_mahalanobis_median(d, 1:50, 1:50)
+	dist1 = distance_robust_mahalanobis_median(d, 25:74, 1:50)
+	dist2 = distance_robust_mahalanobis_median(d, 51:100, 1:50)
+	@test 0 < dist0 < dist1 < dist2
+
+	dist0 = distance_robust_hellinger(d, 1:50, 1:50)
+	dist1 = distance_robust_hellinger(d, 25:74, 1:50)
+	dist2 = distance_robust_hellinger(d, 51:100, 1:50)
+	@test dist0 < dist1 < dist2	
+
+	# Testing permutation tests:
+	# If both ref and pert are sampled from the same distribution,
+	# p-value must be high.
+	# If ref and pert are sampled from non-overlapping distributions,
+	# p-value must be 0.
+	d = rand(100,5)
+	params = (d, 51:100, 1:50)
+	@test 0 < mean(shuffled_distance_robust_mahalanobis_median(params...) .< 
+	               distance_robust_mahalanobis_median(params...)) < 1
+	@test 0 < mean(shuffled_distance_robust_hellinger(params...) .< 
+	               distance_robust_hellinger(params...)) < 1
+
+	d[51:100, :] .+= 1
+	@test mean(shuffled_distance_robust_mahalanobis_median(params...) .<=
+	           distance_robust_mahalanobis_median(params...)) > 0.9
+	@test mean(shuffled_distance_robust_hellinger(params...) .<= 
+	           distance_robust_hellinger(params...)) > 0.9
 end
