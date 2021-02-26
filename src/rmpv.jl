@@ -192,7 +192,7 @@ function distance_robust_hellinger(data, iPert, iRef)
     if (!require("robustbase")) install.packages("robustbase", 
                                 repos = "https://cloud.r-project.org")
     library(robustbase)
-        
+
     set.seed(777)
     mcd1 <- covMcd(setRef)
     mcdCenter1 <- mcd1$center
@@ -273,3 +273,91 @@ function shuffled_distance_robust_hellinger(data, iPert, iRef; nbRep = 250)
     
     return(map(x -> iterShufRHD(), 1:nbRep))
 end
+
+
+""" Compute the Robust Morphological Perturbation Value (RMPV)
+    for a given Experiment `e`, for all levels of a column `s`,
+    compared to rows matching a given filter `f`. 
+    The RMPV quantifies the significance of changes between all
+    conditions (levels in `s`) and a reference condition (defined
+    by the filter `f`). 
+    In brief, the distance of type `dist` between points of each 
+    perturbation and points of the reference is computed and its 
+    statistical significance is defined using a permutation test
+    in which the perturbation and reference labels are shuffled 
+    `nb_rep` times.
+    This returns a DataFrame with three columns:
+    * `Condition`: the levels in `s`
+    * `Distance`: the distance between a condition and the 
+    reference 
+    * `RMPV`: the RMPV (empirical p-value corrected for multiple
+    testing)
+    """
+function robust_morphological_perturbation_value(e::AbstractExperiment, 
+                                                 s::Symbol, 
+                                                 f::AbstractFilter; 
+                                                 nb_rep = 250,
+                                                 dist = :RobHellinger)
+    
+    if dist == :RobHellinger
+        selected_distance = distance_robust_hellinger
+        shuffled_distance = shuffled_distance_robust_hellinger 
+    elseif dist == :RobMedMahalanobis
+        selected_distance = distance_robust_mahalanobis_median
+        shuffled_distance = shuffled_distance_robust_mahalanobis_median
+    else 
+        DomainError(dist, "Invalid `dist` argument. "*
+                          "Only :RobHellinger "*
+                          "and :RobMedMahalanobis "*
+                          "are supported")
+    end
+
+    # All conditions considered
+    cnd_levels = levels(e.data[e.selectedEntries,s])
+
+    # Actual observed distances
+    allRD = map(x -> selected_distance(getdata(e), 
+                                        filterEntriesExperiment(e, Filter(x, s)), 
+                                        filterEntriesExperiment(e, f)), 
+                cnd_levels)
+
+    # Shuffled distances
+    allShuffRD = map(x -> shuffled_distance(getdata(e), 
+                                            filterEntriesExperiment(e, Filter(x, s)), 
+                                            filterEntriesExperiment(e, f), 
+                                            nbRep = nb_rep), 
+                     cnd_levels)
+
+    # Missing values might need to be handled explicitely
+    @assert !any(ismissing.(allRD))
+
+    # Compute the Robust Morphological Perturbation Value
+    plateRMPV = DataFrame()
+    plateRMPV.RMPV = adjust([mean(obs .< sim) for (obs, sim) 
+                in zip(allRD, allShuffRD)], BenjaminiHochberg())
+    plateRMPV.Distance = allRD
+    plateRMPV.Condition = cnd_levels
+
+    return(plateRMPV)
+end
+
+""" Compute the Robust Morphological Perturbation Value (RMPV)
+    for a given Experiment `e`, for all levels of a column `s`,
+    compared to rows matching a given filter `f`. 
+    The RMPV quantifies the significance of changes between all
+    conditions (levels in `s`) and a reference condition (when
+    `s` is equal to `ref`). 
+    """
+function robust_morphological_perturbation_value(e::AbstractExperiment, 
+                                                 s::Symbol, 
+                                                 ref; 
+                                                 nb_rep = 250,
+                                                 dist = :RobHellinger)
+    ref_filter = Filter(ref, s)
+    return(robust_morphological_perturbation_value(e, 
+                                                   s, 
+                                                   ref_filter;
+                                                   nb_rep,
+                                                   dist))
+end
+

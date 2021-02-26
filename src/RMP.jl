@@ -33,8 +33,9 @@ export  logtransform,
         distance_mahalanobis_center,
         shuffled_distance_mahalanobis_median,
         distance_mahalanobis_median,
+        robust_morphological_perturbation_value,
         umap
-using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall
+using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall, MultipleTesting
 using LinearAlgebra: det
 
 include("struct.jl")
