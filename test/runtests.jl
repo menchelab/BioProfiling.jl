@@ -6,6 +6,8 @@ using StatsBase
 using LinearAlgebra: I
 using Random
 using RCall
+using Distributed
+using ParallelDataTransfer
 
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
@@ -570,4 +572,28 @@ end
 	@test rmpv4.RMPV[rmpv4.Condition .== 'B'][1] > 0.1
 	@test rmpv4.RMPV[rmpv4.Condition .== 'C'][1] > 0.1
 	@test rmpv4.RMPV[rmpv4.Condition .== 'D'][1] < 0.1
+end
+
+@testset "parallel_rmpv" begin
+	d = DataFrame(rand(100,5))
+	d.Condition = sample('A':'D', 100);
+
+	e = Experiment(d)
+
+    addprocs(4)
+    pool = CachingPool(workers())
+    @everywhere using RMP
+
+
+	slt = NameSelector(x -> x != "Condition")
+	selectFeaturesExperiment!(e, slt)
+	f = Filter('C', :Condition)
+
+	rmpv = robust_morphological_perturbation_value(e, 
+												   :Condition, 
+												   f,
+												   process_pool = pool)
+
+	# 4 conditions, 3 columns
+	@test size(rmpv) == (4,3)
 end

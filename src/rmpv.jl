@@ -287,6 +287,8 @@ end
     statistical significance is defined using a permutation test
     in which the perturbation and reference labels are shuffled 
     `nb_rep` times.
+    If `process_pool` is a pool of worker processes, they will
+    be used for parallel computation in the permutation test.
     This returns a DataFrame with three columns:
     * `Condition`: the levels in `s`
     * `Distance`: the distance between a condition and the 
@@ -300,9 +302,9 @@ function robust_morphological_perturbation_value end
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  f::AbstractFilter; 
-                                                 nb_rep = 250,
-                                                 dist = :RobHellinger)
-    
+                                                 nb_rep::Int = 250,
+                                                 dist::Symbol = :RobHellinger,
+                                                 process_pool = nothing)
     if dist == :RobHellinger
         selected_distance = distance_robust_hellinger
         shuffled_distance = shuffled_distance_robust_hellinger 
@@ -334,11 +336,24 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
                 cnd_levels)
 
     # Shuffled distances
-    allShuffRD = map(x -> shuffled_distance(getdata(e), 
+    if isnothing(process_pool)
+        allShuffRD = map(x -> shuffled_distance(getdata(e), 
+                                                filterEntriesExperiment(e, Filter(x, s)), 
+                                                filterEntriesExperiment(e, f), 
+                                                nbRep = nb_rep), 
+                         cnd_levels)
+    else
+        sendto(workers(), e=e, 
+                          s=s,
+                          f=f,
+                          nb_rep=nb_rep)
+        allShuffRD = pmap(x -> shuffled_distance(getdata(e), 
                                             filterEntriesExperiment(e, Filter(x, s)), 
                                             filterEntriesExperiment(e, f), 
                                             nbRep = nb_rep), 
+                     process_pool,
                      cnd_levels)
+    end
 
     # Missing values might need to be handled explicitely
     @assert !any(ismissing.(allRD))
@@ -357,8 +372,9 @@ end
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  ref; 
-                                                 nb_rep = 250,
-                                                 dist = :RobHellinger)
+                                                 nb_rep::Int = 250,
+                                                 dist::Symbol = :RobHellinger,
+                                                 processes::Int = 1)
     ref_filter = Filter(ref, s)
     return(robust_morphological_perturbation_value(e, 
                                                    s, 

@@ -36,6 +36,8 @@ export  logtransform,
         robust_morphological_perturbation_value,
         umap
 using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall, MultipleTesting
+using Distributed, ParallelDataTransfer
+
 using LinearAlgebra: det
 
 include("struct.jl")
