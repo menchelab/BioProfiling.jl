@@ -409,6 +409,8 @@ end
 end
 
 @testset "biaseddistances" begin
+	Random.seed!(777)
+
 	# We want significantly more points than dimensions or the covariance
 	# matrix can be singular and the results would not make any sense
 	d = rand(100,5)
@@ -448,6 +450,8 @@ end
 end
 
 @testset "robustdistances" begin
+	Random.seed!(777)
+
 	# First, RCall must be running correctly
 	@test_throws RCall.REvalError R"""
 	library(NotALibrary)
@@ -495,6 +499,8 @@ end
 end
 
 @testset "robust_morphological_perturbation_value" begin
+	Random.seed!(777)
+
 	d = DataFrame(rand(100,5))
 	d.Condition = sample('A':'D', 100);
 
@@ -506,6 +512,11 @@ end
 	slt = NameSelector(x -> x != "Condition")
 	selectFeaturesExperiment!(e, slt)
 	f = Filter('C', :Condition)
+
+	@test_throws DomainError robust_morphological_perturbation_value(e, 
+																     :Condition, 
+																     f,
+																     dist = :IncorrectValue)
 
 	rmpv = robust_morphological_perturbation_value(e, :Condition, f)
 
@@ -531,8 +542,32 @@ end
 													dist = :RobMedMahalanobis)
 
 	# A, B and C have the same distribution but D has a different one
-	@test rmpv2.RMPV[rmpv.Condition .== 'A'][1] > 0.1
-	@test rmpv2.RMPV[rmpv.Condition .== 'B'][1] > 0.1
-	@test rmpv2.RMPV[rmpv.Condition .== 'C'][1] > 0.1
-	@test rmpv2.RMPV[rmpv.Condition .== 'D'][1] < 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'A'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'B'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'C'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'D'][1] < 0.1
+
+	rmpv3 = robust_morphological_perturbation_value(e, 
+													:Condition, 
+													'C', 
+													nb_rep = 100, 
+													dist = :MedMahalanobis)
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv3.RMPV[rmpv3.Condition .== 'A'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'B'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'C'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'D'][1] < 0.1
+
+	rmpv4 = robust_morphological_perturbation_value(e, 
+													:Condition, 
+													'C', 
+													nb_rep = 100, 
+													dist = :CenterMahalanobis)
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv4.RMPV[rmpv4.Condition .== 'A'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'B'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'C'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'D'][1] < 0.1
 end

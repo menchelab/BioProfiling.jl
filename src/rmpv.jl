@@ -277,7 +277,8 @@ end
 
 """ Compute the Robust Morphological Perturbation Value (RMPV)
     for a given Experiment `e`, for all levels of a column `s`,
-    compared to rows matching a given filter `f`. 
+    compared to rows matching a given filter `f` or where `s`
+    is equal to `ref`. 
     The RMPV quantifies the significance of changes between all
     conditions (levels in `s`) and a reference condition (defined
     by the filter `f`). 
@@ -293,6 +294,9 @@ end
     * `RMPV`: the RMPV (empirical p-value corrected for multiple
     testing)
     """
+function robust_morphological_perturbation_value end
+
+# If filter provided for reference
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  f::AbstractFilter; 
@@ -305,11 +309,19 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
     elseif dist == :RobMedMahalanobis
         selected_distance = distance_robust_mahalanobis_median
         shuffled_distance = shuffled_distance_robust_mahalanobis_median
+    elseif dist == :MedMahalanobis
+        selected_distance = distance_mahalanobis_median
+        shuffled_distance = shuffled_distance_mahalanobis_median
+    elseif dist == :CenterMahalanobis
+        selected_distance = distance_mahalanobis_center
+        shuffled_distance = shuffled_distance_mahalanobis_center
     else 
-        DomainError(dist, "Invalid `dist` argument. "*
-                          "Only :RobHellinger "*
-                          "and :RobMedMahalanobis "*
-                          "are supported")
+        throw(DomainError(dist, "Invalid `dist` argument. "*
+                                "Only :RobHellinger "*
+                                "and :RobMedMahalanobis "*
+                                "and :MedMahalanobis "*
+                                "and :CenterMahalanobis "*
+                                "are supported"))
     end
 
     # All conditions considered
@@ -341,13 +353,7 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
     return(plateRMPV)
 end
 
-""" Compute the Robust Morphological Perturbation Value (RMPV)
-    for a given Experiment `e`, for all levels of a column `s`,
-    compared to rows matching a given filter `f`. 
-    The RMPV quantifies the significance of changes between all
-    conditions (levels in `s`) and a reference condition (when
-    `s` is equal to `ref`). 
-    """
+# If reference value provided for reference
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  ref; 
