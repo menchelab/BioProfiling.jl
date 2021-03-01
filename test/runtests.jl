@@ -5,6 +5,9 @@ using Statistics
 using StatsBase
 using LinearAlgebra: I
 using Random
+using RCall
+using Distributed
+using ParallelDataTransfer
 
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
@@ -20,7 +23,7 @@ end
     s = rand(5,5)
     s = s*s' + I
     # Distance of a distribution to itself should be zero, up to
-    # machine precision. NB: approximation includes relative term
+    # machine precision. Note: approximation includes relative term
     # so isapprox(1e-200, 0) = false
 	@test hellinger(c, s, c, s) + 1 ≈ 1 
 	function testpositivedefinite()
@@ -68,9 +71,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -97,9 +98,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -136,9 +135,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -183,9 +181,7 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -219,9 +215,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -257,9 +252,8 @@ end
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
 	                  0.0565727 0.0601279 "Exp1"; 0.022015 0.170559 "Exp2"; 0.498196 0.918719 "Exp1"; 
 	                  0.908576 0.187947 "Exp2"; 0.123237 0.00619995 "Exp2"; 0.341462 0.626406 "Exp1"])
-	# NB: throws a warning in 1.0 suggesting to use rename! instead
-	# Yet rename! only accepts pairs of symbols in late 1.x versions
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
+
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity, :Experiment])
 	d.Ft1 = convert.(Float64, d.Ft1)
 	d.Intensity_MedianIntensity_NeurDensity = convert.(Float64, d.Intensity_MedianIntensity_NeurDensity)
 	d.Experiment = convert.(String, d.Experiment)
@@ -307,7 +301,7 @@ end
 
     # Generate test data
 	d = DataFrame(rand(12,2))
-	names!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
+	rename!(d, [:Ft1, :Intensity_MedianIntensity_NeurDensity])
 	d.Experiment = repeat(["Exp1", "Exp2"], 6)
 
 	e1 = Experiment(d)
@@ -401,17 +395,205 @@ end
 @testset "umap" begin
     # Create dataset with 4 random and 1 index column
     d = DataFrame(rand(40,4))
-	names!(d, Symbol.("Ft" .* string.(1:4)))
+	rename!(d, Symbol.("Ft" .* string.(1:4)))
 	d.Ft5 = 1:40;
 	e = Experiment(d)
 
 	# Set filters
 	f = Filter(10, :Ft5, compare = >)
-	s = negation(NameSelector(x -> occursin("Ft3", x)))
+	s = negation(NameSelector(x -> occursin("Ft3", string(x))))
 	filterExperiment!(e,[f,s])
 
 	# Test dimensions and arguments
 	@test size(umap(e)) == (2, 30)
 	@test size(umap(e, 3, n_neighbors = 10, min_dist = 1, n_epochs = 10)) == (3, 30)
 	@test_throws ArgumentError size(umap(e, 4))
+end
+
+@testset "biaseddistances" begin
+	Random.seed!(777)
+
+	# We want significantly more points than dimensions or the covariance
+	# matrix can be singular and the results would not make any sense
+	d = rand(100,5)
+	@test distance_mahalanobis_center(d, 1:50, 1:50) + 1 ≈ 1
+	
+	d = hcat(d, (1:100)./50)
+	# If some points are share with reference, the distance should be
+	# smaller than to a set of completely different points
+	dist1 = distance_mahalanobis_center(d, 51:100, 1:50)
+	dist2 = distance_mahalanobis_center(d, 25:74, 1:50)
+	@test dist1 > 0
+	@test dist2 > 0
+	@test dist1 > dist2
+	
+	dist0 = distance_mahalanobis_median(d, 1:50, 1:50)
+	dist1 = distance_mahalanobis_median(d, 25:74, 1:50)
+	dist2 = distance_mahalanobis_median(d, 51:100, 1:50)
+	@test 0 < dist0 < dist1 < dist2
+
+	# Testing permutation tests:
+	# If both ref and pert are sampled from the same distribution,
+	# p-value must be high.
+	# If ref and pert are sampled from non-overlapping distributions,
+	# p-value must be 0.
+	d = rand(100,5)
+	params = (d, 51:100, 1:50)
+	@test 0 < mean(shuffled_distance_mahalanobis_center(params...) .< 
+	               distance_mahalanobis_center(params...)) < 1
+	@test 0 < mean(shuffled_distance_mahalanobis_median(params...) .< 
+	               distance_mahalanobis_median(params...)) < 1
+
+	d[51:100, :] .+= 2
+	@test mean(shuffled_distance_mahalanobis_center(params...) .< 
+	           distance_mahalanobis_center(params...)) == 1
+	@test mean(shuffled_distance_mahalanobis_median(params...) .< 
+	           distance_mahalanobis_median(params...)) == 1
+end
+
+@testset "robustdistances" begin
+	Random.seed!(777)
+
+	# First, RCall must be running correctly
+	@test_throws RCall.REvalError R"""
+	library(NotALibrary)
+	"""
+
+	# Robustbase must be installed
+	R"""
+	if (!require("robustbase")) install.packages("robustbase", 
+												  repos = "https://cloud.r-project.org")
+	library(robustbase)
+	"""
+	d = rand(100,5)
+	@test distance_robust_hellinger(d, 1:50, 1:50) + 1 ≈ 1
+	
+	d = hcat(d, (1:100)./50)
+	# If some points are share with reference, the distance should be
+	# smaller than to a set of completely different points
+	dist0 = distance_robust_mahalanobis_median(d, 1:50, 1:50)
+	dist1 = distance_robust_mahalanobis_median(d, 25:74, 1:50)
+	dist2 = distance_robust_mahalanobis_median(d, 51:100, 1:50)
+	@test 0 < dist0 < dist1 < dist2
+
+	dist0 = distance_robust_hellinger(d, 1:50, 1:50)
+	dist1 = distance_robust_hellinger(d, 25:74, 1:50)
+	dist2 = distance_robust_hellinger(d, 51:100, 1:50)
+	@test dist0 < dist1 < dist2	
+
+	# Testing permutation tests:
+	# If both ref and pert are sampled from the same distribution,
+	# p-value must be high.
+	# If ref and pert are sampled from non-overlapping distributions,
+	# p-value must be 0.
+	d = rand(100,5)
+	params = (d, 51:100, 1:50)
+	@test 0 < mean(shuffled_distance_robust_mahalanobis_median(params...) .< 
+	               distance_robust_mahalanobis_median(params...)) < 1
+	@test 0 < mean(shuffled_distance_robust_hellinger(params...) .< 
+	               distance_robust_hellinger(params...)) < 1
+
+	d[51:100, :] .+= 1
+	@test mean(shuffled_distance_robust_mahalanobis_median(params...) .<=
+	           distance_robust_mahalanobis_median(params...)) > 0.9
+	@test mean(shuffled_distance_robust_hellinger(params...) .<= 
+	           distance_robust_hellinger(params...)) > 0.9
+end
+
+@testset "robust_morphological_perturbation_value" begin
+	Random.seed!(777)
+
+	d = DataFrame(rand(100,5))
+	d.Condition = sample('A':'D', 100);
+
+	# Make one condition stand out
+	d[d.Condition .== 'D',1:5] .+= 1;
+
+	e = Experiment(d)
+
+	slt = NameSelector(x -> x != "Condition")
+	selectFeaturesExperiment!(e, slt)
+	f = Filter('C', :Condition)
+
+	@test_throws DomainError robust_morphological_perturbation_value(e, 
+																     :Condition, 
+																     f,
+																     dist = :IncorrectValue)
+
+	rmpv = robust_morphological_perturbation_value(e, :Condition, f)
+
+	# 4 conditions, 3 columns
+	@test size(rmpv) == (4,3)
+
+	# Distance of control to itself == 0
+	@test rmpv[rmpv.Condition .== 'C', :Distance][1] + 1 ≈ 1
+
+	# Shifted distribution should be the most different
+	@test maximum(rmpv.Distance) == rmpv.Distance[rmpv.Condition .== 'D'][1]
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv.RMPV[rmpv.Condition .== 'A'][1] > 0.1
+	@test rmpv.RMPV[rmpv.Condition .== 'B'][1] > 0.1
+	@test rmpv.RMPV[rmpv.Condition .== 'C'][1] > 0.1
+	@test rmpv.RMPV[rmpv.Condition .== 'D'][1] < 0.1
+
+	rmpv2 = robust_morphological_perturbation_value(e, 
+													:Condition, 
+													'C', 
+													nb_rep = 100, 
+													dist = :RobMedMahalanobis)
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv2.RMPV[rmpv2.Condition .== 'A'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'B'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'C'][1] > 0.1
+	@test rmpv2.RMPV[rmpv2.Condition .== 'D'][1] < 0.1
+
+	rmpv3 = robust_morphological_perturbation_value(e, 
+													:Condition, 
+													'C', 
+													nb_rep = 100, 
+													dist = :MedMahalanobis)
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv3.RMPV[rmpv3.Condition .== 'A'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'B'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'C'][1] > 0.1
+	@test rmpv3.RMPV[rmpv3.Condition .== 'D'][1] < 0.1
+
+	rmpv4 = robust_morphological_perturbation_value(e, 
+													:Condition, 
+													'C', 
+													nb_rep = 100, 
+													dist = :CenterMahalanobis)
+
+	# A, B and C have the same distribution but D has a different one
+	@test rmpv4.RMPV[rmpv4.Condition .== 'A'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'B'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'C'][1] > 0.1
+	@test rmpv4.RMPV[rmpv4.Condition .== 'D'][1] < 0.1
+end
+
+@testset "parallel_rmpv" begin
+	d = DataFrame(rand(100,5))
+	d.Condition = sample('A':'D', 100);
+
+	e = Experiment(d)
+
+    addprocs(4)
+    pool = CachingPool(workers())
+    @everywhere using RMP
+
+
+	slt = NameSelector(x -> x != "Condition")
+	selectFeaturesExperiment!(e, slt)
+	f = Filter('C', :Condition)
+
+	rmpv = robust_morphological_perturbation_value(e, 
+												   :Condition, 
+												   f,
+												   process_pool = pool)
+
+	# 4 conditions, 3 columns
+	@test size(rmpv) == (4,3)
 end

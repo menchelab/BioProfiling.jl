@@ -134,7 +134,7 @@ function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractSimpleSelect
 end
 
 function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractNameSelector)
-    selectedFtDF = map(s.summarize, names(e.data[e.selectedFeatures]))
+    selectedFtDF = map(s.summarize, names(e.data[:,e.selectedFeatures]))
     return(e.selectedFeatures[selectedFtDF])
 end
 
@@ -191,7 +191,8 @@ function negation(r::AbstractSimpleFilter)
     return(neg_r)
 end
 
-"""Return the data in Experiment `e` for its selected entries and features
+"""Return a copy of the data in Experiment `e` for its 
+selected entries and features.
 """
 function getdata(e::Experiment)
     return(e.data[e.selectedEntries, e.selectedFeatures])
