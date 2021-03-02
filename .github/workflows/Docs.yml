@@ -4,7 +4,7 @@ on:
     paths-ignore:
     - 'test/**'
     branches:
-    - main
+    - master
 jobs:
   docs:
     name: Documentation
