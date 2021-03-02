@@ -302,7 +302,7 @@ function robust_morphological_perturbation_value end
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  f::AbstractFilter; 
-                                                 nb_rep::Int = 250,
+                                                 nb_rep::Int64 = 250,
                                                  dist::Symbol = :RobHellinger,
                                                  process_pool = nothing)
     if dist == :RobHellinger
@@ -372,14 +372,15 @@ end
 function robust_morphological_perturbation_value(e::AbstractExperiment, 
                                                  s::Symbol, 
                                                  ref; 
-                                                 nb_rep::Int = 250,
+                                                 nb_rep::Int64 = 250,
                                                  dist::Symbol = :RobHellinger,
-                                                 processes::Int = 1)
+                                                 process_pool = nothing)
     ref_filter = Filter(ref, s)
     return(robust_morphological_perturbation_value(e, 
                                                    s, 
                                                    ref_filter;
-                                                   nb_rep,
-                                                   dist))
+                                                   nb_rep=nb_rep,
+                                                   dist=dist,
+                                                   process_pool=process_pool))
 end
 
