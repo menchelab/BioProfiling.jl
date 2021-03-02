@@ -7,3 +7,7 @@ makedocs(sitename="RMP.jl",
 	        "Examples" => "examples.md"
          ],
          authors = "Loan Vulliard" )
+
+deploydocs(
+    repo = "github.com/menchelab/BioProfiling.jl.git",
+)
