@@ -18,7 +18,7 @@ end
 """ Permute labels and compute the Mahalanobis Distance to center (MDC)
     in a dataset 'data' for a given perturbation of indices 'indpert' 
     compared to a reference of indices 'indref', to create an empirical distribution."""
-function shuffled_distance_mahalanobis_center(data, indpert, indref; nbRep = 250)
+function shuffled_distance_mahalanobis_center(data, indpert, indref; nb_rep = 250)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = Matrix(vcat(setRef, setPert))
@@ -43,7 +43,7 @@ function shuffled_distance_mahalanobis_center(data, indpert, indref; nbRep = 250
         return(MD)
     end       
     
-    return(map(x -> iterShufMD(), 1:nbRep))
+    return(map(x -> iterShufMD(), 1:nb_rep))
 end
 
 """ Compute the median Mahalanobis Distance (MD)
@@ -63,7 +63,7 @@ end
 """ Permute labels and compute the median Mahalanobis Distance (RMD)
     in a dataset 'data' for a given perturbation of indices 'indpert' 
     compared to a reference of indices 'indref', to create an empirical distribution."""
-function shuffled_distance_mahalanobis_median(data, indpert, indref; nbRep = 250)
+function shuffled_distance_mahalanobis_median(data, indpert, indref; nb_rep = 250)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = Matrix(vcat(setRef, setPert))
@@ -86,7 +86,7 @@ function shuffled_distance_mahalanobis_median(data, indpert, indref; nbRep = 250
         return(MD)
     end       
     
-    return(map(x -> iterShufMD(), 1:nbRep))
+    return(map(x -> iterShufMD(), 1:nb_rep))
 end
 
 
@@ -127,7 +127,7 @@ end
 """ Permute labels and compute the median Robust Mahalanobis Distance (RMD)
     in a dataset 'data' for a given perturbation of indices 'indpert' 
     compared to a reference of indices 'indref', to create an empirical distribution."""
-function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nbRep = 250)
+function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_rep = 250)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = vcat(setRef, setPert)
@@ -138,7 +138,7 @@ function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nbRe
     
     # Ensure that we have enough points to compute distance
     if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
-        return(repeat([missing], nbRep))
+        return(repeat([missing], nb_rep))
     end
     # NB: having less points than twice the number of dimensions leads to singularity
     
@@ -168,7 +168,7 @@ function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nbRe
         return(RMD)
     end       
     
-    return(map(x -> iterShufRMD(), 1:nbRep))
+    return(map(x -> iterShufRMD(), 1:nb_rep))
 end
 
 """ Compute the Robust Hellinger Distance (RHD)
@@ -218,7 +218,7 @@ end
 """ Permute labels and compute the Robust Hellinger Distance (RHD)
     in a dataset `data` for a given perturbation of indices `indpert` 
     compared to a reference of indices `indref`, to create an empirical distribution."""
-function shuffled_distance_robust_hellinger(data, indpert, indref; nbRep = 250)
+function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = vcat(setRef, setPert)
@@ -229,7 +229,7 @@ function shuffled_distance_robust_hellinger(data, indpert, indref; nbRep = 250)
     
     # Ensure that we have enough points to compute distance
     if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
-        return(repeat([missing], nbRep))
+        return(repeat([missing], nb_rep))
     end
     # NB: having less points than twice the number of dimensions leads to singularity
     
@@ -271,7 +271,7 @@ function shuffled_distance_robust_hellinger(data, indpert, indref; nbRep = 250)
         return(RHD)
     end       
     
-    return(map(x -> iterShufRHD(), 1:nbRep))
+    return(map(x -> iterShufRHD(), 1:nb_rep))
 end
 
 
@@ -327,7 +327,7 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
     end
 
     # All conditions considered
-    cnd_levels = levels(e.data[e.selectedEntries,s])
+    cnd_levels = levels(e.data[e.selected_entries,s])
 
     # Actual observed distances
     allRD = map(x -> selected_distance(getdata(e), 
@@ -340,7 +340,7 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
         allShuffRD = map(x -> shuffled_distance(getdata(e), 
                                                 filter_entries(e, Filter(x, s)), 
                                                 filter_entries(e, f), 
-                                                nbRep = nb_rep), 
+                                                nb_rep = nb_rep), 
                          cnd_levels)
     else
         sendto(workers(), e=e, 
@@ -350,7 +350,7 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
         allShuffRD = pmap(x -> shuffled_distance(getdata(e), 
                                             filter_entries(e, Filter(x, s)), 
                                             filter_entries(e, f), 
-                                            nbRep = nb_rep), 
+                                            nb_rep = nb_rep), 
                      process_pool,
                      cnd_levels)
     end

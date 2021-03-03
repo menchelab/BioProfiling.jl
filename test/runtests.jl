@@ -78,7 +78,7 @@ end
 
 	e1 = Experiment(d)
 	@test e1.description == "No description provided"
-	@test e1.selectedEntries == 1:12
+	@test e1.selected_entries == 1:12
 
 	# Additional checks that could be performed:
 	# Test print format
@@ -107,14 +107,14 @@ end
 	e1 = Experiment(d)
 
 	filter_entries!(e1, f1)
-	@test e1.selectedEntries == [1,2,7,9,12]
+	@test e1.selected_entries == [1,2,7,9,12]
 
 	filter_entries!(e1, f2)
-	@test e1.selectedEntries == [7]
+	@test e1.selected_entries == [7]
 
 	e2 = Experiment(d)
 	filter_entries!(e2, [f1,f2])
-	@test e2.selectedEntries == [7]
+	@test e2.selected_entries == [7]
 
 	e3 = Experiment(d)
 	f3 = Filter(0.8, :Ft1, compare = >, description = "Large feature 1")
@@ -153,7 +153,7 @@ end
 
 	@test select_features(e1, s1) == [1,2]
 	select_features!(e1, [s1, s2])
-	@test e1.selectedFeatures == [2]
+	@test e1.selected_features == [2]
 
 	strToRemove = ["MedianIntensity", "MorePatterns"]
 	s3 = NameSelector(x -> !any(occursin.(strToRemove, String(x))))
@@ -161,7 +161,7 @@ end
 	@test select_features(e2, s3) == [1,3]
 
 	select_features!(e2, [s1, s2, s3])
-	@test length(e2.selectedFeatures) == 0
+	@test length(e2.selected_features) == 0
 
 	e3 = Experiment(d)
 	s4 = deepcopy(s1)
@@ -205,8 +205,8 @@ end
 	            description = d2)
 
 	filter!(e1,[cs1,f1,f2])
-	@test length(e1.selectedFeatures) == 2
-	@test e1.selectedEntries == [7]
+	@test length(e1.selected_features) == 2
+	@test e1.selected_entries == [7]
 end
 
 @testset "diagnostic" begin
@@ -315,9 +315,9 @@ end
 	filter!(e1,[f1,s1])
 
 	# Test `getdata`
-	@test length(e1.selectedFeatures) == 2
-	@test length(e1.selectedEntries) == 6
-	@test getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
+	@test length(e1.selected_features) == 2
+	@test length(e1.selected_entries) == 6
+	@test getdata(e1) == e1.data[e1.selected_entries, e1.selected_features]
 
 	# Test `logtransform`
 
@@ -367,29 +367,29 @@ end
 	filter!(e4,[f1,s1])
 	decorrelate!(e4)
 	# First column always kept, inverse column removed
-	@test 1 in e4.selectedFeatures
-	@test !(4 in e4.selectedFeatures)
+	@test 1 in e4.selected_features
+	@test !(4 in e4.selected_features)
 
 	e4 = Experiment(d)
 	filter!(e4,[f1,s1])
 	decorrelate!(e4, threshold = 1)
 	# Not perfectly correlated by design
-	@test 5 in e4.selectedFeatures
+	@test 5 in e4.selected_features
 
 	e4 = Experiment(d)
 	filter!(e4,[f1,s1])
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
-	@test 5 in e4.selectedFeatures
+	@test 5 in e4.selected_features
 	if cor(getdata(e4).Ft4, getdata(e4).Ft3) < 0.8
-		@test 4 in e4.selectedFeatures
+		@test 4 in e4.selected_features
 	end
-	@test !(1 in e4.selectedFeatures)
+	@test !(1 in e4.selected_features)
 
 	# Test sorting by mad
 	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
 	decorrelate_by_mad!(e5)
-	@test e5.selectedFeatures == [3]
+	@test e5.selected_features == [3]
 end
 
 @testset "umap" begin
