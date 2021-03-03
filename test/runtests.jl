@@ -234,16 +234,16 @@ end
 
 	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.0565727)
 
-	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.0565727]
-	@test diagnosticURLImage(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
+	@test diagnostic_path(e1, cf1, :Ft1) == [0.0565727]
+	@test diagnostic_path(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
 
-	@test diagnosticImages(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
+	@test diagnostic_images(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
 	# Additional checks that could be performed:
-	# Centers of diagnosticURLImage
+	# Centers of diagnostic_path
 	# getColorImage [internal]
 	# colimgifrgb [internal]
-	# rgb parameters of diagnosticImages
-	# output of diagnosticImages
+	# rgb parameters of diagnostic_images
+	# output of diagnostic_images
 end
 
 @testset "negation" begin
