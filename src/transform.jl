@@ -19,7 +19,7 @@ normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 of an Experiment `e` on control values matching a Filter `f`
 """
 function normtransform!(e::Experiment, f::AbstractFilter)
-    f_col = filterEntriesExperiment(e,f)
+    f_col = filter_entries(e,f)
     e.data[e.selectedEntries, e.selectedFeatures] .= e.data[:, e.selectedFeatures] |>
                                                      eachcol |>
                                                      x -> map(y -> normtransform(y[e.selectedEntries],

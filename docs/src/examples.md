@@ -30,7 +30,7 @@ e = Experiment(d, description = "Small simulated experiment")
 slt = NameSelector(x -> x != "Condition")
 
 # Apply your NameSelector to the Experiment
-selectFeaturesExperiment!(e, slt);
+select_features!(e, slt);
 ```
 
 ### Compute statistical significance of changes to a reference

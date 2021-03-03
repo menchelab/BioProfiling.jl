@@ -3,7 +3,7 @@
 function diagnostic(e::Experiment,
                     f::AbstractFilter;
                     features = [:Metadata_Row, :Metadata_Column, :Metadata_Field])
-    subdata = e.data[filterEntriesExperiment(e, f),:]
+    subdata = e.data[filter_entries(e, f),:]
     return(subdata[:,features])
 end
 

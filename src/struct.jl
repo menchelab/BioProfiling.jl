@@ -56,14 +56,14 @@ end
 
 """Return filtered entries in an Experiment `e` based on filter `f`
 """
-function filterEntriesExperiment(e::AbstractExperiment, f::AbstractSimpleFilter)
+function filter_entries(e::AbstractExperiment, f::AbstractSimpleFilter)
     expEntries = e.data[e.selectedEntries, f.feature]
     return(e.selectedEntries[f.compare.(expEntries, f.value)])
 end
 
-function filterEntriesExperiment(e::AbstractExperiment, f::AbstractCombinationFilter)
-    e1 = filterEntriesExperiment(e, f.filter1)
-    e2 = filterEntriesExperiment(e, f.filter2)
+function filter_entries(e::AbstractExperiment, f::AbstractCombinationFilter)
+    e1 = filter_entries(e, f.filter1)
+    e2 = filter_entries(e, f.filter2)
     return(sort(f.operator(e1, e2)))
 end
 
@@ -71,15 +71,15 @@ end
 """Filter entries in an Experiment `e` based on filter(s) `f`,
 updating `e.selectedEntries` in place accordingly.
 """
-function filterEntriesExperiment!(e::AbstractExperiment, f::AbstractFilter)
+function filter_entries!(e::AbstractExperiment, f::AbstractFilter)
     # Currently returns the indices kept
-    e.selectedEntries = filterEntriesExperiment(e,f)
+    e.selectedEntries = filter_entries(e,f)
 end
 
 
-function filterEntriesExperiment!(e::AbstractExperiment, filters::Array{T,1}) where {T<:AbstractFilter}
+function filter_entries!(e::AbstractExperiment, filters::Array{T,1}) where {T<:AbstractFilter}
     for f in filters
-        filterEntriesExperiment!(e, f)
+        filter_entries!(e, f)
     end
 end
 
@@ -121,7 +121,7 @@ end
 
 """Return selected features in an Experiment `e` based on selectors `s`
 """
-function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractSimpleSelector)
+function select_features(e::AbstractExperiment, s::AbstractSimpleSelector)
     # NB: isnothing was not implemented in 1.0
     if s.subset === nothing
         data = e.data[e.selectedEntries, e.selectedFeatures]
@@ -133,46 +133,68 @@ function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractSimpleSelect
     return(e.selectedFeatures[[x for x in selectedFtDF[1,:]]])
 end
 
-function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractNameSelector)
+function select_features(e::AbstractExperiment, s::AbstractNameSelector)
     selectedFtDF = map(s.summarize, names(e.data[:,e.selectedFeatures]))
     return(e.selectedFeatures[selectedFtDF])
 end
 
-function selectFeaturesExperiment(e::AbstractExperiment, s::AbstractCombinationSelector)
-    f1 = selectFeaturesExperiment(e, s.selector1)
-    f2 = selectFeaturesExperiment(e, s.selector2)
+function select_features(e::AbstractExperiment, s::AbstractCombinationSelector)
+    f1 = select_features(e, s.selector1)
+    f2 = select_features(e, s.selector2)
     return(sort(s.operator(f1, f2)))
 end
 
 """Return selected features in an Experiment `e` based on selectors `s`,
 updating `e.selectedFeatures` in place accordingly.
 """
-function selectFeaturesExperiment!(e::AbstractExperiment, s::AbstractSelector)
+function select_features!(e::AbstractExperiment, s::AbstractSelector)
     # Currently returns the indices kept
-    e.selectedFeatures = selectFeaturesExperiment(e,s)
+    e.selectedFeatures = select_features(e,s)
 end
 
-function selectFeaturesExperiment!(e::AbstractExperiment, selectors::Array{T,1}) where {T<:AbstractSelector}
+function select_features!(e::AbstractExperiment, selectors::Array{T,1}) where {T<:AbstractSelector}
     for s in selectors
-        selectFeaturesExperiment!(e, s)
+        select_features!(e, s)
     end
 end
 
+
+# Not exported in favor of the shorter "filter!" and "select!"
 """For an experiment `e`, update in place `e.selectedFeatures` and 
 `e.selectedEntries` based on an array `arr` of feature selectors and 
 entry filters. Filters and selectors are applied sequentially.
 """
-function filterExperiment!(e::AbstractExperiment, arr::Array{T,1}) where {T<:AbstractReduce}
+function filter_experiment!(e::AbstractExperiment, arr::Array{T,1}) where {T<:AbstractReduce}
     for a in arr
-        filterExperiment!(e, a)
+        filter!(e, a)
     end
 end
 
-filterExperiment!(e::AbstractExperiment, s::AbstractSelector) = selectFeaturesExperiment!(e,s)
-filterExperiment!(e::AbstractExperiment, f::AbstractFilter) = filterEntriesExperiment!(e,f)
+"""For an experiment `e`, update in place `e.selectedFeatures` and 
+`e.selectedEntries` based on a feature selector `s`.
+"""
+function filter_experiment!(e::AbstractExperiment, s::AbstractSelector) 
+    select_features!(e,s)
+end
 
-selectExperiment! = filterExperiment!
+"""For an experiment `e`, update in place `e.selectedFeatures` and 
+`e.selectedEntries` based on an entry filter `f`.
+"""
+filter_experiment!(e::AbstractExperiment, f::AbstractFilter) = filter_entries!(e,f)
 
+
+# Aliases 
+@doc (@doc filter_experiment!)
+Base.filter!(e::AbstractExperiment, 
+                   arr::Array{T,1}) where {T<:AbstractReduce} = filter_experiment!(e,arr)
+Base.filter!(e::AbstractExperiment, s::AbstractSelector) = filter_experiment!(e,s)
+Base.filter!(e::AbstractExperiment, f::AbstractFilter) = filter_experiment!(e,f)
+
+@doc (@doc filter_experiment!)
+DataFrames.select!(e::AbstractExperiment, 
+                   arr::Array{T,1}) where {T<:AbstractReduce} = filter_experiment!(e,arr)
+DataFrames.select!(e::AbstractExperiment, s::AbstractSelector) = filter_experiment!(e,s)
+DataFrames.select!(e::AbstractExperiment, f::AbstractFilter) = filter_experiment!(e,f)
 
 """Return a negative Filter or Selector by inverting 
 the entries or features that are kept and excluded.

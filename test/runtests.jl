@@ -106,14 +106,14 @@ end
 
 	e1 = Experiment(d)
 
-	filterEntriesExperiment!(e1, f1)
+	filter_entries!(e1, f1)
 	@test e1.selectedEntries == [1,2,7,9,12]
 
-	filterEntriesExperiment!(e1, f2)
+	filter_entries!(e1, f2)
 	@test e1.selectedEntries == [7]
 
 	e2 = Experiment(d)
-	filterEntriesExperiment!(e2, [f1,f2])
+	filter_entries!(e2, [f1,f2])
 	@test e2.selectedEntries == [7]
 
 	e3 = Experiment(d)
@@ -121,8 +121,8 @@ end
 	cf1 = CombinationFilter(f1,f2,intersect)
 	cf2 = CombinationFilter(cf1,f3,union)
 
-	@test filterEntriesExperiment(e3, cf1) == [7]
-	@test filterEntriesExperiment(e3, cf2) == [2,6,7,10]
+	@test filter_entries(e3, cf1) == [7]
+	@test filter_entries(e3, cf2) == [2,6,7,10]
 
 	# Additional checks that could be performed:
 	# Filter.compare::Function -> Make sure it takes 2 arguments and return 1?
@@ -151,16 +151,16 @@ end
 	@test s1.subset === nothing
 	@test s2.description == "High mean for Exp1"
 
-	@test selectFeaturesExperiment(e1, s1) == [1,2]
-	selectFeaturesExperiment!(e1, [s1, s2])
+	@test select_features(e1, s1) == [1,2]
+	select_features!(e1, [s1, s2])
 	@test e1.selectedFeatures == [2]
 
 	strToRemove = ["MedianIntensity", "MorePatterns"]
 	s3 = NameSelector(x -> !any(occursin.(strToRemove, String(x))))
 	e2 = Experiment(d)
-	@test selectFeaturesExperiment(e2, s3) == [1,3]
+	@test select_features(e2, s3) == [1,3]
 
-	selectFeaturesExperiment!(e2, [s1, s2, s3])
+	select_features!(e2, [s1, s2, s3])
 	@test length(e2.selectedFeatures) == 0
 
 	e3 = Experiment(d)
@@ -172,10 +172,10 @@ end
 	s5.summarize = !s5.summarize
 
 	cs1 = CombinationSelector(s4,s5,union)
-	@test selectFeaturesExperiment(e3, cs1) == [2,3]
+	@test select_features(e3, cs1) == [2,3]
 end
 
-@testset "filterExperiment!" begin
+@testset "filter!" begin
     # Define example dataset
 	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
@@ -204,7 +204,7 @@ end
 	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, compare = isless, 
 	            description = d2)
 
-	filterExperiment!(e1,[cs1,f1,f2])
+	filter!(e1,[cs1,f1,f2])
 	@test length(e1.selectedFeatures) == 2
 	@test e1.selectedEntries == [7]
 end
@@ -267,8 +267,8 @@ end
 	nf1 = negation(f1)
 
 	@test nf1.description == "Do not "*f1.description
-	@test all(e1.data.Experiment[filterEntriesExperiment(e1, f1)] .== "Exp1")
-	@test all(e1.data.Experiment[filterEntriesExperiment(e1, nf1)] .== "Exp2")
+	@test all(e1.data.Experiment[filter_entries(e1, f1)] .== "Exp1")
+	@test all(e1.data.Experiment[filter_entries(e1, nf1)] .== "Exp2")
 
 	# Test negation of simple selector
 	s1 = Selector(x -> eltype(x) <: Number, description = "Keep numeric features")
@@ -276,10 +276,10 @@ end
 
 	@test ns1.description == "Do not "*s1.description
 
-	ft_ns1 = selectFeaturesExperiment(e1, ns1)
+	ft_ns1 = select_features(e1, ns1)
 	@test ft_ns1 == [3]
 	# The union of the columns selected by a selector and its negation should be the set of all columns
-	append!(ft_ns1, selectFeaturesExperiment(e1, s1))
+	append!(ft_ns1, select_features(e1, s1))
 	@test Set(ft_ns1) == Set(1:ncol(e1.data))
 
     # Test negation of name selector
@@ -288,10 +288,10 @@ end
 
 	@test ns2.description == "Do not "*s2.description
 
-	ft_ns2 = selectFeaturesExperiment(e1, ns2)
+	ft_ns2 = select_features(e1, ns2)
 	@test ft_ns2 == [2,3]
 	# The union of the columns selected by a selector and its negation should be the set of all columns
-	append!(ft_ns2, selectFeaturesExperiment(e1, s2))
+	append!(ft_ns2, select_features(e1, s2))
 	@test Set(ft_ns2) == Set(1:ncol(e1.data))
 end
 
@@ -312,7 +312,7 @@ end
 	s1 = Selector(x -> eltype(x) <: Number,
 	              description = "Keep numerical features")
 
-	filterExperiment!(e1,[f1,s1])
+	filter!(e1,[f1,s1])
 
 	# Test `getdata`
 	@test length(e1.selectedFeatures) == 2
@@ -364,20 +364,20 @@ end
 	d.Intensity_MedianIntensity_NeurDensity[1] = 0
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4)
 	# First column always kept, inverse column removed
 	@test 1 in e4.selectedFeatures
 	@test !(4 in e4.selectedFeatures)
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4, threshold = 1)
 	# Not perfectly correlated by design
 	@test 5 in e4.selectedFeatures
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
 	@test 5 in e4.selectedFeatures
@@ -402,7 +402,7 @@ end
 	# Set filters
 	f = Filter(10, :Ft5, compare = >)
 	s = negation(NameSelector(x -> occursin("Ft3", string(x))))
-	filterExperiment!(e,[f,s])
+	filter!(e,[f,s])
 
 	# Test dimensions and arguments
 	@test size(umap(e)) == (2, 30)
@@ -512,7 +512,7 @@ end
 	e = Experiment(d)
 
 	slt = NameSelector(x -> x != "Condition")
-	selectFeaturesExperiment!(e, slt)
+	select_features!(e, slt)
 	f = Filter('C', :Condition)
 
 	@test_throws DomainError robust_morphological_perturbation_value(e, 
@@ -586,7 +586,7 @@ end
 
 
 	slt = NameSelector(x -> x != "Condition")
-	selectFeaturesExperiment!(e, slt)
+	select_features!(e, slt)
 	f = Filter('C', :Condition)
 
 	rmpv = robust_morphological_perturbation_value(e, 

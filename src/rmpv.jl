@@ -331,15 +331,15 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
 
     # Actual observed distances
     allRD = map(x -> selected_distance(getdata(e), 
-                                        filterEntriesExperiment(e, Filter(x, s)), 
-                                        filterEntriesExperiment(e, f)), 
+                                        filter_entries(e, Filter(x, s)), 
+                                        filter_entries(e, f)), 
                 cnd_levels)
 
     # Shuffled distances
     if isnothing(process_pool)
         allShuffRD = map(x -> shuffled_distance(getdata(e), 
-                                                filterEntriesExperiment(e, Filter(x, s)), 
-                                                filterEntriesExperiment(e, f), 
+                                                filter_entries(e, Filter(x, s)), 
+                                                filter_entries(e, f), 
                                                 nbRep = nb_rep), 
                          cnd_levels)
     else
@@ -348,8 +348,8 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
                           f=f,
                           nb_rep=nb_rep)
         allShuffRD = pmap(x -> shuffled_distance(getdata(e), 
-                                            filterEntriesExperiment(e, Filter(x, s)), 
-                                            filterEntriesExperiment(e, f), 
+                                            filter_entries(e, Filter(x, s)), 
+                                            filter_entries(e, f), 
                                             nbRep = nb_rep), 
                      process_pool,
                      cnd_levels)
