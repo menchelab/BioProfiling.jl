@@ -1,9 +1,9 @@
 """ Compute the Mahalanobis Distance to center (MDC)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef'."""
-function distance_mahalanobis_center(data, iPert, iRef)
-    setPert = Matrix(data[iPert,:])
-    setRef = Matrix(data[iRef,:])
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref'."""
+function distance_mahalanobis_center(data, indpert, indref)
+    setPert = Matrix(data[indpert,:])
+    setRef = Matrix(data[indref,:])
 
     mdCenter = dropdims(mean(setRef, dims = 1), dims = 1)
     mdCov = cov(setRef)
@@ -16,11 +16,11 @@ function distance_mahalanobis_center(data, iPert, iRef)
 end
 
 """ Permute labels and compute the Mahalanobis Distance to center (MDC)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef', to create an empirical distribution."""
-function shuffled_distance_mahalanobis_center(data, iPert, iRef; nbRep = 250)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:]  
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref', to create an empirical distribution."""
+function shuffled_distance_mahalanobis_center(data, indpert, indref; nbRep = 250)
+    setPert = data[indpert,:]
+    setRef = data[indref,:]  
     set = Matrix(vcat(setRef, setPert))
     
     function iterShufMD()
@@ -47,11 +47,11 @@ function shuffled_distance_mahalanobis_center(data, iPert, iRef; nbRep = 250)
 end
 
 """ Compute the median Mahalanobis Distance (MD)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef'."""
-function distance_mahalanobis_median(data, iPert, iRef)
-    setPert = data[iPert,:]
-    setRef = Matrix(data[iRef,:])
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref'."""
+function distance_mahalanobis_median(data, indpert, indref)
+    setPert = data[indpert,:]
+    setRef = Matrix(data[indref,:])
 
     mdCenter = dropdims(mean(setRef, dims = 1), dims = 1)
     mdCov = cov(setRef)
@@ -61,11 +61,11 @@ function distance_mahalanobis_median(data, iPert, iRef)
 end
 
 """ Permute labels and compute the median Mahalanobis Distance (RMD)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef', to create an empirical distribution."""
-function shuffled_distance_mahalanobis_median(data, iPert, iRef; nbRep = 250)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:]  
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref', to create an empirical distribution."""
+function shuffled_distance_mahalanobis_median(data, indpert, indref; nbRep = 250)
+    setPert = data[indpert,:]
+    setRef = data[indref,:]  
     set = Matrix(vcat(setRef, setPert))
     
     function iterShufMD()
@@ -91,12 +91,12 @@ end
 
 
 """ Compute the median Robust Mahalanobis Distance (RMD)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef'.
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref'.
     See https://e-archivo.uc3m.es/bitstream/handle/10016/24613/ws201710.pdf """
-function distance_robust_mahalanobis_median(data, iPert, iRef)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:] 
+function distance_robust_mahalanobis_median(data, indpert, indref)
+    setPert = data[indpert,:]
+    setRef = data[indref,:] 
 
     # Ensure that we have enough points to compute distance
     if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
@@ -125,11 +125,11 @@ function distance_robust_mahalanobis_median(data, iPert, iRef)
 end
 
 """ Permute labels and compute the median Robust Mahalanobis Distance (RMD)
-    in a dataset 'data' for a given perturbation of indices 'iPert' 
-    compared to a reference of indices 'iRef', to create an empirical distribution."""
-function shuffled_distance_robust_mahalanobis_median(data, iPert, iRef; nbRep = 250)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:]  
+    in a dataset 'data' for a given perturbation of indices 'indpert' 
+    compared to a reference of indices 'indref', to create an empirical distribution."""
+function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nbRep = 250)
+    setPert = data[indpert,:]
+    setRef = data[indref,:]  
     set = vcat(setRef, setPert)
 
     nset = size(set, 1)
@@ -172,11 +172,11 @@ function shuffled_distance_robust_mahalanobis_median(data, iPert, iRef; nbRep = 
 end
 
 """ Compute the Robust Hellinger Distance (RHD)
-    in a dataset `data` for a given perturbation of indices `iPert` 
-    compared to a reference of indices `iRef`."""
-function distance_robust_hellinger(data, iPert, iRef)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:] 
+    in a dataset `data` for a given perturbation of indices `indpert` 
+    compared to a reference of indices `indref`."""
+function distance_robust_hellinger(data, indpert, indref)
+    setPert = data[indpert,:]
+    setRef = data[indref,:] 
 
     # Ensure that we have enough points to compute distance
     if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
@@ -216,11 +216,11 @@ function distance_robust_hellinger(data, iPert, iRef)
 end
 
 """ Permute labels and compute the Robust Hellinger Distance (RHD)
-    in a dataset `data` for a given perturbation of indices `iPert` 
-    compared to a reference of indices `iRef`, to create an empirical distribution."""
-function shuffled_distance_robust_hellinger(data, iPert, iRef; nbRep = 250)
-    setPert = data[iPert,:]
-    setRef = data[iRef,:]  
+    in a dataset `data` for a given perturbation of indices `indpert` 
+    compared to a reference of indices `indref`, to create an empirical distribution."""
+function shuffled_distance_robust_hellinger(data, indpert, indref; nbRep = 250)
+    setPert = data[indpert,:]
+    setRef = data[indref,:]  
     set = vcat(setRef, setPert)
 
     nset = size(set, 1)
