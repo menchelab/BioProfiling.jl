@@ -511,8 +511,15 @@ end
 
 	e = Experiment(d)
 
+	# Select numerical columns
 	slt = NameSelector(x -> x != "Condition")
 	select_features!(e, slt)
+	# Filter out some rows
+	# Useful to check that the RMPV computation correctly works on subset of the data
+	row_filter = Filter(0.9, :x1, compare = (x,y) -> round(x, digits = 1) != y)
+	filter_entries!(e, row_filter)
+
+	# Define reference condition
 	f = Filter('C', :Condition)
 
 	@test_throws DomainError robust_morphological_perturbation_value(e, 
