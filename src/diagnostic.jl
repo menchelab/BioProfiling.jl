@@ -3,7 +3,7 @@
 function diagnostic(e::Experiment,
                     f::AbstractFilter;
                     features = [:Metadata_Row, :Metadata_Column, :Metadata_Field])
-    subdata = e.data[filterEntriesExperiment(e, f),:]
+    subdata = e.data[filter_entries(e, f),:]
     return(subdata[:,features])
 end
 
@@ -15,11 +15,11 @@ If `rgx` provides a list of regex substitutions, it will be applied on all file 
 output (which is useful if you're in a different file system or environment as the one described
 in the `Experiment`'s data).
 """
-function diagnosticURLImage(e::Experiment,
-                            f::AbstractFilter,
-                            s::Symbol;
-                            center = false, 
-                            rgx = nothing)
+function diagnostic_path(e::Experiment,
+                         f::AbstractFilter,
+                         s::Symbol;
+                         center = false, 
+                         rgx = nothing)
     diagCols = [s]
     if center
         centerCols = [:AreaShape_Center_X, :AreaShape_Center_Y, 
@@ -92,7 +92,7 @@ in the `Experiment`'s data).
 If `rgb` provides a list of 3 lists of regex substitutions, it will be applied to generate
 the path to 3 images.
 """
-function diagnosticImages(e::Experiment,
+function diagnostic_images(e::Experiment,
                           f::AbstractFilter,
                           s::Symbol;
                           path = "./",
@@ -105,7 +105,7 @@ function diagnosticImages(e::Experiment,
                           keepsubfolders = 0)
 
     # Get addresses of images matching criteria
-    imagesURL = diagnosticURLImage(e, f, s; center = center, rgx = rgx)
+    imagesURL = diagnostic_path(e, f, s; center = center, rgx = rgx)
 
     # A limit is set to the number of images displayed by default
     # To avoid overflowing notebooks

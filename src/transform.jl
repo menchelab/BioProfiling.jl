@@ -5,7 +5,7 @@ logtransform(x) = log.(x .+ 1 .- minimum(x))
 for all selected features of an Experiment `e`.
 """
 function logtransform!(e::Experiment)
-    e.data[e.selectedEntries, e.selectedFeatures] .= e |>
+    e.data[e.selected_entries, e.selected_features] .= e |>
                                                      getdata |>    
                                                      eachcol |>    
                                                      x -> map(logtransform, x) |>  
@@ -19,10 +19,10 @@ normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 of an Experiment `e` on control values matching a Filter `f`
 """
 function normtransform!(e::Experiment, f::AbstractFilter)
-    f_col = filterEntriesExperiment(e,f)
-    e.data[e.selectedEntries, e.selectedFeatures] .= e.data[:, e.selectedFeatures] |>
+    f_col = filter_entries(e,f)
+    e.data[e.selected_entries, e.selected_features] .= e.data[:, e.selected_features] |>
                                                      eachcol |>
-                                                     x -> map(y -> normtransform(y[e.selectedEntries],
+                                                     x -> map(y -> normtransform(y[e.selected_entries],
                                                                                  y[f_col]), x) |>
                                                      x -> hcat(x...)    
 end
@@ -65,7 +65,7 @@ decorrelate(data::AbstractMatrix; ordercol = nothing, threshold = 0.8) =
     a given order 'ordercol' (defaults to left to right).
 """
 function decorrelate!(e::Experiment; ordercol = nothing, threshold = 0.8)
-    e.selectedFeatures = e.selectedFeatures[decorrelate(getdata(e), 
+    e.selected_features = e.selected_features[decorrelate(getdata(e), 
                                                         ordercol=ordercol,
                                                         threshold=threshold)]
 end

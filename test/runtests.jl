@@ -1,4 +1,4 @@
-using RMP
+using BioProfiling
 using Test
 using DataFrames
 using Statistics
@@ -78,7 +78,7 @@ end
 
 	e1 = Experiment(d)
 	@test e1.description == "No description provided"
-	@test e1.selectedEntries == 1:12
+	@test e1.selected_entries == 1:12
 
 	# Additional checks that could be performed:
 	# Test print format
@@ -106,23 +106,23 @@ end
 
 	e1 = Experiment(d)
 
-	filterEntriesExperiment!(e1, f1)
-	@test e1.selectedEntries == [1,2,7,9,12]
+	filter_entries!(e1, f1)
+	@test e1.selected_entries == [1,2,7,9,12]
 
-	filterEntriesExperiment!(e1, f2)
-	@test e1.selectedEntries == [7]
+	filter_entries!(e1, f2)
+	@test e1.selected_entries == [7]
 
 	e2 = Experiment(d)
-	filterEntriesExperiment!(e2, [f1,f2])
-	@test e2.selectedEntries == [7]
+	filter_entries!(e2, [f1,f2])
+	@test e2.selected_entries == [7]
 
 	e3 = Experiment(d)
 	f3 = Filter(0.8, :Ft1, compare = >, description = "Large feature 1")
 	cf1 = CombinationFilter(f1,f2,intersect)
 	cf2 = CombinationFilter(cf1,f3,union)
 
-	@test filterEntriesExperiment(e3, cf1) == [7]
-	@test filterEntriesExperiment(e3, cf2) == [2,6,7,10]
+	@test filter_entries(e3, cf1) == [7]
+	@test filter_entries(e3, cf2) == [2,6,7,10]
 
 	# Additional checks that could be performed:
 	# Filter.compare::Function -> Make sure it takes 2 arguments and return 1?
@@ -151,17 +151,17 @@ end
 	@test s1.subset === nothing
 	@test s2.description == "High mean for Exp1"
 
-	@test selectFeaturesExperiment(e1, s1) == [1,2]
-	selectFeaturesExperiment!(e1, [s1, s2])
-	@test e1.selectedFeatures == [2]
+	@test select_features(e1, s1) == [1,2]
+	select_features!(e1, [s1, s2])
+	@test e1.selected_features == [2]
 
 	strToRemove = ["MedianIntensity", "MorePatterns"]
 	s3 = NameSelector(x -> !any(occursin.(strToRemove, String(x))))
 	e2 = Experiment(d)
-	@test selectFeaturesExperiment(e2, s3) == [1,3]
+	@test select_features(e2, s3) == [1,3]
 
-	selectFeaturesExperiment!(e2, [s1, s2, s3])
-	@test length(e2.selectedFeatures) == 0
+	select_features!(e2, [s1, s2, s3])
+	@test length(e2.selected_features) == 0
 
 	e3 = Experiment(d)
 	s4 = deepcopy(s1)
@@ -172,10 +172,10 @@ end
 	s5.summarize = !s5.summarize
 
 	cs1 = CombinationSelector(s4,s5,union)
-	@test selectFeaturesExperiment(e3, cs1) == [2,3]
+	@test select_features(e3, cs1) == [2,3]
 end
 
-@testset "filterExperiment!" begin
+@testset "filter!" begin
     # Define example dataset
 	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
 	                  0.306519 0.58938 "Exp2"; 0.71313 0.184778 "Exp2"; 0.818107 0.163095 "Exp2"; 
@@ -204,9 +204,9 @@ end
 	f2 = Filter(0.2, :Intensity_MedianIntensity_NeurDensity, compare = isless, 
 	            description = d2)
 
-	filterExperiment!(e1,[cs1,f1,f2])
-	@test length(e1.selectedFeatures) == 2
-	@test e1.selectedEntries == [7]
+	filter!(e1,[cs1,f1,f2])
+	@test length(e1.selected_features) == 2
+	@test e1.selected_entries == [7]
 end
 
 @testset "diagnostic" begin
@@ -234,16 +234,16 @@ end
 
 	@test diagnostic(e1, cf1, features = [:Ft1]) == DataFrame(Ft1 = 0.0565727)
 
-	@test diagnosticURLImage(e1, cf1, :Ft1) == [0.0565727]
-	@test diagnosticURLImage(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
+	@test diagnostic_path(e1, cf1, :Ft1) == [0.0565727]
+	@test diagnostic_path(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"]) == ["example.png"]
 
-	@test diagnosticImages(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
+	@test diagnostic_images(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
 	# Additional checks that could be performed:
-	# Centers of diagnosticURLImage
+	# Centers of diagnostic_path
 	# getColorImage [internal]
 	# colimgifrgb [internal]
-	# rgb parameters of diagnosticImages
-	# output of diagnosticImages
+	# rgb parameters of diagnostic_images
+	# output of diagnostic_images
 end
 
 @testset "negation" begin
@@ -267,8 +267,8 @@ end
 	nf1 = negation(f1)
 
 	@test nf1.description == "Do not "*f1.description
-	@test all(e1.data.Experiment[filterEntriesExperiment(e1, f1)] .== "Exp1")
-	@test all(e1.data.Experiment[filterEntriesExperiment(e1, nf1)] .== "Exp2")
+	@test all(e1.data.Experiment[filter_entries(e1, f1)] .== "Exp1")
+	@test all(e1.data.Experiment[filter_entries(e1, nf1)] .== "Exp2")
 
 	# Test negation of simple selector
 	s1 = Selector(x -> eltype(x) <: Number, description = "Keep numeric features")
@@ -276,10 +276,10 @@ end
 
 	@test ns1.description == "Do not "*s1.description
 
-	ft_ns1 = selectFeaturesExperiment(e1, ns1)
+	ft_ns1 = select_features(e1, ns1)
 	@test ft_ns1 == [3]
 	# The union of the columns selected by a selector and its negation should be the set of all columns
-	append!(ft_ns1, selectFeaturesExperiment(e1, s1))
+	append!(ft_ns1, select_features(e1, s1))
 	@test Set(ft_ns1) == Set(1:ncol(e1.data))
 
     # Test negation of name selector
@@ -288,10 +288,10 @@ end
 
 	@test ns2.description == "Do not "*s2.description
 
-	ft_ns2 = selectFeaturesExperiment(e1, ns2)
+	ft_ns2 = select_features(e1, ns2)
 	@test ft_ns2 == [2,3]
 	# The union of the columns selected by a selector and its negation should be the set of all columns
-	append!(ft_ns2, selectFeaturesExperiment(e1, s2))
+	append!(ft_ns2, select_features(e1, s2))
 	@test Set(ft_ns2) == Set(1:ncol(e1.data))
 end
 
@@ -312,12 +312,12 @@ end
 	s1 = Selector(x -> eltype(x) <: Number,
 	              description = "Keep numerical features")
 
-	filterExperiment!(e1,[f1,s1])
+	filter!(e1,[f1,s1])
 
 	# Test `getdata`
-	@test length(e1.selectedFeatures) == 2
-	@test length(e1.selectedEntries) == 6
-	@test RMP.getdata(e1) == e1.data[e1.selectedEntries, e1.selectedFeatures]
+	@test length(e1.selected_features) == 2
+	@test length(e1.selected_entries) == 6
+	@test getdata(e1) == e1.data[e1.selected_entries, e1.selected_features]
 
 	# Test `logtransform`
 
@@ -364,32 +364,32 @@ end
 	d.Intensity_MedianIntensity_NeurDensity[1] = 0
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4)
 	# First column always kept, inverse column removed
-	@test 1 in e4.selectedFeatures
-	@test !(4 in e4.selectedFeatures)
+	@test 1 in e4.selected_features
+	@test !(4 in e4.selected_features)
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4, threshold = 1)
 	# Not perfectly correlated by design
-	@test 5 in e4.selectedFeatures
+	@test 5 in e4.selected_features
 
 	e4 = Experiment(d)
-	filterExperiment!(e4,[f1,s1])
+	filter!(e4,[f1,s1])
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
-	@test 5 in e4.selectedFeatures
+	@test 5 in e4.selected_features
 	if cor(getdata(e4).Ft4, getdata(e4).Ft3) < 0.8
-		@test 4 in e4.selectedFeatures
+		@test 4 in e4.selected_features
 	end
-	@test !(1 in e4.selectedFeatures)
+	@test !(1 in e4.selected_features)
 
 	# Test sorting by mad
 	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
 	decorrelate_by_mad!(e5)
-	@test e5.selectedFeatures == [3]
+	@test e5.selected_features == [3]
 end
 
 @testset "umap" begin
@@ -402,7 +402,7 @@ end
 	# Set filters
 	f = Filter(10, :Ft5, compare = >)
 	s = negation(NameSelector(x -> occursin("Ft3", string(x))))
-	filterExperiment!(e,[f,s])
+	filter!(e,[f,s])
 
 	# Test dimensions and arguments
 	@test size(umap(e)) == (2, 30)
@@ -511,8 +511,15 @@ end
 
 	e = Experiment(d)
 
+	# Select numerical columns
 	slt = NameSelector(x -> x != "Condition")
-	selectFeaturesExperiment!(e, slt)
+	select_features!(e, slt)
+	# Filter out some rows
+	# Useful to check that the RMPV computation correctly works on subset of the data
+	row_filter = Filter(0.9, :x1, compare = (x,y) -> round(x, digits = 1) != y)
+	filter_entries!(e, row_filter)
+
+	# Define reference condition
 	f = Filter('C', :Condition)
 
 	@test_throws DomainError robust_morphological_perturbation_value(e, 
@@ -582,11 +589,11 @@ end
 
     addprocs(4)
     pool = CachingPool(workers())
-    @everywhere using RMP
+    @everywhere using BioProfiling
 
 
 	slt = NameSelector(x -> x != "Condition")
-	selectFeaturesExperiment!(e, slt)
+	select_features!(e, slt)
 	f = Filter('C', :Condition)
 
 	rmpv = robust_morphological_perturbation_value(e, 
