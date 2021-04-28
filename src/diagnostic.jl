@@ -86,6 +86,7 @@ assuming they are stored in variables `:AreaShape_Center_X`, `:AreaShape_Center_
 `:AreaShape_Center_Y` and `:AreaShape_Center_Y_1` (default if you merge nuclear and cytoplasm 
 measurements from CellProfiler outputs).  
 Display up to `showlimit` images if `show` is true.  
+Save up to `savelimit` images if `saveimages` is true.  
 If `rgx` provides a list of regex substitutions, it will be applied on all image paths 
 (which is useful if you're in a different file system or environment as the one described
 in the `Experiment`'s data).
@@ -100,6 +101,7 @@ function diagnostic_images(e::Experiment,
                           show = false,
                           center = false, 
                           showlimit::Int64 = 20, 
+                          savelimit::Int64 = 20,
                           rgb = nothing,
                           rgx = nothing,
                           keepsubfolders = 0)
@@ -110,6 +112,7 @@ function diagnostic_images(e::Experiment,
     # A limit is set to the number of images displayed by default
     # To avoid overflowing notebooks
     showcounter = 0
+    savecounter = 0
     if !center  
         for imgPath = imagesURL
         	colImg = colimgifrgb(imgPath, rgb)
@@ -117,7 +120,8 @@ function diagnostic_images(e::Experiment,
                 showcounter += 1
                 display(colImg)
             end
-            if saveimages
+            if saveimages & (savecounter < savelimit)
+                savecounter += 1
             	save(outimgpath(imgPath, path, keepsubfolders), colImg)
             elseif showcounter >= showlimit | !show
             	# Images are not displayed nor saved
@@ -142,7 +146,8 @@ function diagnostic_images(e::Experiment,
                 showcounter += 1
                 display(colImg)
             end
-            if saveimages
+            if saveimages & (savecounter < savelimit)
+                savecounter += 1
             	save(outimgpath(imgPath, path, keepsubfolders), colImg)
             elseif showcounter >= showlimit | !show
             	# Images are not displayed nor saved
