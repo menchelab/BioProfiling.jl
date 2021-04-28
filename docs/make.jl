@@ -1,8 +1,8 @@
-using Documenter, RMP
+using Documenter, BioProfiling
 
-makedocs(sitename="RMP.jl",
+makedocs(sitename="BioProfiling.jl",
 		 pages = [
-	        "RMP.jl" => "index.md",
+	        "BioProfiling.jl" => "index.md",
 	        "API" => "api.md",
 	        "Examples" => "examples.md"
          ],

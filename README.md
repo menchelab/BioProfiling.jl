@@ -26,7 +26,7 @@ Use the following to load this package:
 Use the following to install the package:
 
 	import Pkg
-	Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/BioProfiling.jl.git", rev="Renaming"))
+	Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/BioProfiling.jl.git"))
 
 Use can then use the package:
 

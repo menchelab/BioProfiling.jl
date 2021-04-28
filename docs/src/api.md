@@ -1,4 +1,4 @@
-# RMP.jl API
+# BioProfiling.jl API
 
 
 ## Table of contents
@@ -9,7 +9,7 @@
 ## Functions
 
 ```@autodocs
-Modules = [RMP]
+Modules = [BioProfiling]
 Private = false
 Order   = [:module, :type, :constant, :function, :macro]
 ```

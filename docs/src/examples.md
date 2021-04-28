@@ -1,4 +1,4 @@
-# RMP.jl examples
+# BioProfiling.jl examples
 
 ## Introduction 
 
@@ -11,7 +11,7 @@ This package provides multidimensional profiling tools to quantify complex biolo
 The package requires data describing your experiment in a tabular format. Here we simulate such a dataset with 100 profiles, composed of five columns with numerical features (e.g. morphological measurements) and one metadata column (e.g. experimental condition).
 
 ```julia
-using RMP, DataFrames, Random, StatsBase
+using BioProfiling, DataFrames, Random, StatsBase
 
 d = DataFrame(rand(100,5))
 d.Condition = sample('A':'D', 100);
