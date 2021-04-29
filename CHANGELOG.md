@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 No changes yet.
 
-## v1.0.0 - 2021-04-28
+## v1.0.0 - 2021-05-01
 ### Changed
 - Rename package to BioProfiling
 - Rename several methods and arguments to avoid camel case
