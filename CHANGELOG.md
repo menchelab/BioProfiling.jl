@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-No changes yet.
+### Changed
+- Correct intermittent error due to singular covariant matrices in helliger distance computation
+
+### Added
+- Continuous integration on MacOS
 
 ## v1.0.0 - 2021-05-01
 ### Changed
