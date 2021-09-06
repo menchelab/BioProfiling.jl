@@ -503,8 +503,8 @@ end
 @testset "robust_morphological_perturbation_value" begin
 	Random.seed!(777)
 
-	d = DataFrame(rand(100,5))
-	d.Condition = sample('A':'D', 100);
+	d = DataFrame(rand(200,5))
+	d.Condition = sample('A':'D', 200);
 
 	# Make one condition stand out
 	d[d.Condition .== 'D',1:5] .+= 1;
@@ -547,7 +547,7 @@ end
 	rmpv2 = robust_morphological_perturbation_value(e, 
 													:Condition, 
 													'C', 
-													nb_rep = 100, 
+													nb_rep = 200, 
 													dist = :RobMedMahalanobis)
 
 	# A, B and C have the same distribution but D has a different one
@@ -559,7 +559,7 @@ end
 	rmpv3 = robust_morphological_perturbation_value(e, 
 													:Condition, 
 													'C', 
-													nb_rep = 100, 
+													nb_rep = 200, 
 													dist = :MedMahalanobis)
 
 	# A, B and C have the same distribution but D has a different one
@@ -571,7 +571,7 @@ end
 	rmpv4 = robust_morphological_perturbation_value(e, 
 													:Condition, 
 													'C', 
-													nb_rep = 100, 
+													nb_rep = 200, 
 													dist = :CenterMahalanobis)
 
 	# A, B and C have the same distribution but D has a different one
