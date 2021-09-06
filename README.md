@@ -2,6 +2,8 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/menchelab/RMP.jl/blob/master/LICENSE)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://menchelab.github.io/BioProfiling.jl/dev/)
+[![CI](https://github.com/menchelab/BioProfiling.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/menchelab/BioProfiling.jl/actions/workflows/CI.yml)
+[![CI](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml/badge.svg)](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml)
 
 Robust multidimensional profiling to quantify complex changes via the minimum covariance determinant.
 ---
