@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Continuous integration on MacOS
 - Continuous integration on Ubuntu
+- Test coverage through Codecov
 
 ## v1.0.0 - 2021-05-01
 ### Changed
