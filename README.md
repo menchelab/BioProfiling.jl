@@ -4,6 +4,7 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://menchelab.github.io/BioProfiling.jl/dev/)
 [![CI](https://github.com/menchelab/BioProfiling.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/menchelab/BioProfiling.jl/actions/workflows/CI.yml)
 [![CI](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml/badge.svg)](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml)
+[![codecov](https://codecov.io/gh/menchelab/BioProfiling.jl/branch/master/graph/badge.svg?token=JE1KSLYYR6)](https://codecov.io/gh/menchelab/BioProfiling.jl)
 
 Robust multidimensional profiling to quantify complex changes via the minimum covariance determinant.
 ---
