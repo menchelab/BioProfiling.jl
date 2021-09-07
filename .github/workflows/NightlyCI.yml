@@ -4,6 +4,9 @@ on:
     branches:
       - master
   push:
+    paths-ignore:
+    - 'CHANGELOG.md'
+    - 'docs/**'
     branches:
       - master
     tags: '*'
