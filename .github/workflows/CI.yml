@@ -4,6 +4,10 @@ on:
     branches:
       - master
   push:
+    paths-ignore:
+    - '.github/**'
+    - 'CHANGELOG.md'
+    - 'docs/**'
     branches:
       - master
     tags: '*'

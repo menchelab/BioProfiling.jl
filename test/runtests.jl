@@ -503,8 +503,8 @@ end
 @testset "robust_morphological_perturbation_value" begin
 	Random.seed!(777)
 
-	d = DataFrame(rand(100,5))
-	d.Condition = sample('A':'D', 100);
+	d = DataFrame(rand(250,5))
+	d.Condition = sample('A':'D', 250);
 
 	# Make one condition stand out
 	d[d.Condition .== 'D',1:5] .+= 1;

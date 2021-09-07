@@ -3,6 +3,8 @@ on:
   push:
     paths-ignore:
     - 'test/**'
+    - '.github/**'
+    - 'CHANGELOG.md'
     branches:
     - master
 jobs:
