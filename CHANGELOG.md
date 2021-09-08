@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v1.1.0 - unreleased
+### Added
+- Option to remove R seed from distance computation
+
+## v1.0.x - unreleased
 ### Changed
 - Correct intermittent error due to singular covariant matrices in helliger distance computation
 
