@@ -571,6 +571,51 @@ end
 	# A, B and C have the same distribution but D has a different one
 	@test rmpv4.RMPV[rmpv4.Condition .== 'C'][1] > 0.1
 	@test rmpv4.RMPV[rmpv4.Condition .== 'D'][1] < 0.1
+
+	# Test reproducibility
+    Random.seed!(777)
+    rmpv_run1 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobMedMahalanobis)
+    Random.seed!(777)
+    rmpv_run2 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobMedMahalanobis)
+    Random.seed!(777)
+    rmpv_run3 = robust_morphological_perturbation_value(e, 
+                                                    :Condition, 
+                                                    'C', 
+                                                    nb_rep = 4, 
+                                                    dist = :RobMedMahalanobis,
+                                                    r_seed = false)
+    @test rmpv_run1 == rmpv_run2
+    @test rmpv_run1 != rmpv_run3
+
+    Random.seed!(777)
+    rmpv_run1 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobHellinger)
+    Random.seed!(777)
+    rmpv_run2 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobHellinger)
+    Random.seed!(777)
+    rmpv_run3 = robust_morphological_perturbation_value(e, 
+                                                    :Condition, 
+                                                    'C', 
+                                                    nb_rep = 4, 
+                                                    dist = :RobHellinger,
+                                                    r_seed = false)
+    @test rmpv_run1 == rmpv_run2
+    @test rmpv_run1 != rmpv_run3
 end
 
 @testset "parallel_rmpv" begin
