@@ -20,14 +20,14 @@ UMAP = "c4f8c510-2410-5be4-91d7-4fbaeb39457e"
 
 [compat]
 DataFrames = "0.20 - 0.22"
+FileIO = "1"
+ImageMagick = "0.7, 1"
+Images = "0.17 - 0.24"
 MultipleTesting = "0.4"
 ParallelDataTransfer = "0.4 - 0.5"
 RCall = "^0.13.7"
 StatsBase = "0.31 - 0.33"
 UMAP = "^0.1.6"
-FileIO = "1"
-ImageMagick = "0.7, 1"
-Images = "0.17 - 0.24"
 julia = "^1.4"
 
 [extras]

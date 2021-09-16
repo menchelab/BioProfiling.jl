@@ -1,10 +1,24 @@
+"""[intended for internal use only]
+Convert all selected data columns to floats
+"""
+function _data_to_float!(e::Experiment)
+    # Make sure all values are numbers
+    @assert all(eltype.(eachcol(getdata(e))) .<: Number)
+    # Convert each column to floats
+    for colname in names(getdata(e))
+        e.data[!,colname] = float.(e.data[:,colname])
+    end
+end
+
 """Approximate normal distribution"""
 logtransform(x) = log.(x .+ 1 .- minimum(x))
 
 """Approximate normal distribution of selected entries 
 for all selected features of an Experiment `e`.
+Warning: columns are converted to float when necessary.
 """
 function logtransform!(e::Experiment)
+    _data_to_float!(e)
     e.data[e.selected_entries, e.selected_features] .= e |>
                                                      getdata |>    
                                                      eachcol |>    
@@ -16,10 +30,13 @@ end
 normtransform(x,y) = (x .- median(y)) ./ mad(y, normalize = true)
 
 """Center and scale all selected entries for each selectead features
-of an Experiment `e` on control values matching a Filter `f`
+of an Experiment `e` on control values matching a Filter `f`,
+based on the median and median absolute deviation of the control.
+Warning: columns are converted to float when necessary.
 """
 function normtransform!(e::Experiment, f::AbstractFilter)
     f_col = filter_entries(e,f)
+    _data_to_float!(e)
     e.data[e.selected_entries, e.selected_features] .= e.data[:, e.selected_features] |>
                                                      eachcol |>
                                                      x -> map(y -> normtransform(y[e.selected_entries],

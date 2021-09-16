@@ -381,15 +381,37 @@ end
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
 	@test 5 in e4.selected_features
-	if cor(getdata(e4).Ft4, getdata(e4).Ft3) < 0.8
+	if cor(e4.data[e4.selected_entries, :Ft4], 
+		   e4.data[e4.selected_entries, :Ft3]) < 0.8
 		@test 4 in e4.selected_features
+	else
+		@test !(4 in e4.selected_features)
 	end
+
 	@test !(1 in e4.selected_features)
 
 	# Test sorting by mad
 	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
 	decorrelate_by_mad!(e5)
 	@test e5.selected_features == [3]
+
+	# Test handling of non-float variables
+	d.Ft2 = rand(1:4, size(d,1))
+	e5 = Experiment(d)
+
+	thr = sort(getdata(e5).Intensity_MedianIntensity_NeurDensity)[end-2]
+	f3 = Filter(thr, :Intensity_MedianIntensity_NeurDensity, 
+	       compare = >=, description = "Top 3 values")
+
+	@test_throws AssertionError logtransform!(e5)
+	@test_throws AssertionError normtransform!(e5,f3)
+
+	filter!(e5,[s1])
+
+	logtransform!(e5)
+	normtransform!(e5,f3)
+
+	@test eltype(getdata(e5).Ft2) == Float64
 end
 
 @testset "umap" begin
