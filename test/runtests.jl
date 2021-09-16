@@ -408,10 +408,12 @@ end
 
 	filter!(e5,[s1])
 
+	e6 = deepcopy(e5)
 	logtransform!(e5)
-	normtransform!(e5,f3)
+	normtransform!(e6,f3)
 
 	@test eltype(getdata(e5).Ft2) == Float64
+	@test eltype(getdata(e6).Ft2) == Float64
 end
 
 @testset "umap" begin

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 - Correct intermittent error due to singular covariant matrices in helliger distance computation
+- Convert columns to float if need for data log-transformation and normalization
 
 ### Added
 - Continuous integration on MacOS
