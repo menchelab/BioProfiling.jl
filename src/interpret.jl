@@ -8,7 +8,8 @@ function most_variable_features(e::Experiment; top::Int64 = 0)
                  getdata |>    
                  eachcol |>
                  x -> mad.(x, normalize = true) |>
-                 sortperm
+                 sortperm |>
+                 reverse
 
     # Get symbols from indices
     e_mad_sym = names(getdata(e))[e_mad_ind]
@@ -19,4 +20,13 @@ function most_variable_features(e::Experiment; top::Int64 = 0)
     end
 
     return(e_mad_sym)
+end
+
+"""
+Return the 
+"""
+function characteristic_features(e::Experiment, 
+                                 reference, 
+                                 condition;
+                                 top::Int64 = 0)
 end

@@ -246,6 +246,25 @@ end
 	# output of diagnostic_images
 end
 
+@testset "interpret" begin
+	# Define example dataset
+	d = DataFrame([[0,2,4,6,8,21],[0,1,2,3,4,0],[0,3,6,9,12,3],'A':'F'])
+	rename!(d, [Symbol.("Ft".*string.(1:3))..., :Class])
+
+	f1 = Filter('F', :Class, compare = !=, description = "Exclude row")
+	s1 = NameSelector(x -> occursin("Ft", String(x)), "Keep numerical features")
+
+	e = Experiment(d)
+	select!(e, [f1,s1])
+
+	@test most_variable_features(e) == ["Ft3", "Ft1", "Ft2"]
+
+	# Test equivalence to sorting by mad
+	top1ft = most_variable_features(e, top = 1)
+	decorrelate_by_mad!(e)
+	@test names(e.data)[e.selected_features] == top1ft
+end
+
 @testset "negation" begin
 	# Define example dataset
 	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
