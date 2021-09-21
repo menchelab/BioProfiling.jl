@@ -263,6 +263,29 @@ end
 	top1ft = most_variable_features(e, top = 1)
 	decorrelate_by_mad!(e)
 	@test names(e.data)[e.selected_features] == top1ft
+
+    d = DataFrame(rand(120,3))
+	rename!(d, Symbol.("Ft".*string.(1:3)))
+	d.Class = repeat(["Ref", "A", "B"], 40)
+
+	# Add specific differences for each class
+	d[d.Class .== "A",:Ft2] .+= 2;
+	d[d.Class .== "B",:Ft3] .+= 2;
+
+	f1 = Filter(0.9, :Ft1, compare = <=, description = "Exclude 10% of entries")
+	s1 = NameSelector(x -> occursin("Ft", String(x)), "Keep numerical features")
+
+	e = Experiment(d)
+	select!(e, [f1,s1])
+
+	filt_Ref = Filter("Ref", :Class)
+	filt_A = Filter("A", :Class)
+	filt_B = Filter("B", :Class)
+
+	@test characteristic_features(e, filt_Ref, filt_A, top = 1) == ["Ft2"]
+	@test characteristic_features(e, filt_Ref, filt_B, top = 1) == ["Ft3"]
+	@test characteristic_features(e, filt_A, filt_B)[3] == "Ft1"
+	@test characteristic_features(e, filt_A, filt_B) == characteristic_features(e, filt_B, filt_A)
 end
 
 @testset "negation" begin

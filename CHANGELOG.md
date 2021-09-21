@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Option to remove R seed from distance computation
 - `most_variable_features` method
+- `characteristic_features` method
 
 ## v1.0.x - unreleased
 ### Changed
