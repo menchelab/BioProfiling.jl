@@ -36,6 +36,7 @@ export  logtransform,
         robust_morphological_perturbation_value,
         most_variable_features,
         characteristic_features,
+        most_correlated,
         umap
 using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall, MultipleTesting
 using Distributed, ParallelDataTransfer

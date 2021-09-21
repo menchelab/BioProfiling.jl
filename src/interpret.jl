@@ -53,3 +53,36 @@ function characteristic_features(e::Experiment,
 
     return(sym)
 end
+
+"""
+Return (all or if provided the `top`) features
+in `e` associated the most with `ref` (absolute
+Pearson correlation).
+"""
+function most_correlated(e::Experiment,
+                         ref::AbstractVector;
+                         top::Int64 = 0)
+    @assert all( [x <: Number for x in eltype.(eachcol(getdata(e)))] )
+    mostcor_ind = e |> getdata |>
+                   x -> cor(ref, Array(x)) |> 
+                   x -> abs.(x) |>
+                   x -> sortperm([x...]) |>
+                   reverse
+
+    # Get symbols from indices
+    mostcor = names(getdata(e))[mostcor_ind]
+
+    # Truncate if needed
+    if (top > 0) && (length(mostcor) > top)
+        mostcor = mostcor[1:top]
+    end
+
+    return(mostcor)
+end
+
+function most_correlated(e::Experiment,
+                         ref::Symbol;
+                         top::Int64 = 0)
+    ref_vector = e.data[e.selected_entries,ref]
+    most_correlated(e,ref_vector,top = top)
+end

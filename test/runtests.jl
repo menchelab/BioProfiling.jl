@@ -286,6 +286,12 @@ end
 	@test characteristic_features(e, filt_Ref, filt_B, top = 1) == ["Ft3"]
 	@test characteristic_features(e, filt_A, filt_B)[3] == "Ft1"
 	@test characteristic_features(e, filt_A, filt_B) == characteristic_features(e, filt_B, filt_A)
+
+	correlated_ref = 3 .* getdata(e).Ft2;
+	@test most_correlated(e, correlated_ref, top = 1)[1] == "Ft2"
+	@test most_correlated(e, :Ft1)[1] == "Ft1"
+	e.data.Ft2 .-= 2 .* e.data.Ft3
+	@test most_correlated(e, :Ft3) == ["Ft3", "Ft2", "Ft1"]
 end
 
 @testset "negation" begin
