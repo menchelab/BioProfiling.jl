@@ -9,6 +9,30 @@ using RCall
 using Distributed
 using ParallelDataTransfer
 
+@testset "freqtable" begin
+	d = DataFrame(Any[0.05131 0.32830 "Exp1"; 0.83296 0.97647 "Exp1"; 0.66463 0.66939 "Exp2"; 
+	                  0.30651 0.58938 "Exp2"; 0.71313 0.18477 "Exp2"; 0.81810 0.16309 "Exp2"; 
+	                  0.05657 0.06012 "Exp1"; 0.02205 0.17055 "Exp2"; 0.49819 0.91871 "Exp1"; 
+	                  0.90857 0.18794 "Exp2"; 0.12327 0.00619 "Exp2"; 0.34146 0.62640 "Exp1"])
+	rename!(d, [:Ft1, :Ft2, :Experiment])
+
+	e1 = Experiment(d, description = "Test Experiment")
+
+	d1 = "Reject cells with high Ft2 values"
+	f1 = Filter(0.9, :Ft2, compare = isless, 
+	            description = d1)
+
+	@test freqtable(e1, f1) == [2,10]
+	filter_entries!(e1, f1)
+
+	d2 = "Select only a single experiment"
+    f2 = Filter("Exp1", :Experiment, description = d2)
+
+    @test freqtable(e1, f2) == [7,3]
+
+    @test freqtable(e1, :Experiment) == [3,7]
+end
+
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
     @test decorrelate(X) == [1,4]

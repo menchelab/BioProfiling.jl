@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `characteristic_features` method
 - `most_correlated` method
 - MissingFilter structures 
+- `freqtable` support
 
 ## v1.0.x - unreleased
 ### Changed

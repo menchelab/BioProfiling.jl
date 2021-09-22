@@ -174,3 +174,31 @@ function getColorImage(R::String, G::String, B::String; normalize = true)
     end
     colorview(RGB, imgR, imgG, imgB)
 end
+
+# Expand freqtable to support Experiment objects,
+# either to know how many entries are selected
+# by a filter or the values taken by a feature
+# for the subset of the entries selected.
+"""
+Expand `freqtable` to support `Experiment` objects.
+Find the frequency of the values taken by feature `s`
+in Experiment `e`.
+"""
+function FreqTables.freqtable(e::Experiment,
+                              s::Symbol;
+                              args...)
+    return(freqtable(getdata(e)[!,s]; args...))
+end
+
+"""
+Expand `freqtable` to support `Experiment` objects.
+Find the frequency of the values taken by feature `s`
+in Experiment `e`.
+"""
+function FreqTables.freqtable(e::Experiment,
+                              f::AbstractFilter;
+                              args...)
+    entries_kept = [x in filter_entries(e, f) ? "Kept" : "Discarded" 
+                    for x in e.selected_entries]
+    return(freqtable(entries_kept; args...))
+end

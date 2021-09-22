@@ -38,9 +38,10 @@ export  logtransform,
         most_variable_features,
         characteristic_features,
         most_correlated,
+        freqtable,
         umap
 using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall, MultipleTesting
-using Distributed, ParallelDataTransfer
+using Distributed, ParallelDataTransfer, FreqTables
 
 using LinearAlgebra: det
 
