@@ -127,6 +127,20 @@ end
 	# Additional checks that could be performed:
 	# Filter.compare::Function -> Make sure it takes 2 arguments and return 1?
 	# CombinationFilter.operator::Function -> Make sure it takes 2 lists and return 1?
+
+	filter_entries!(e3, f2)
+
+	# Add missing values
+	e3.data.Ft1 = Array{Union{Missing, Float64},1}(e3.data.Ft1)
+	e3.data.Experiment = Array{Union{Missing, String},1}(e3.data.Experiment)	
+	e3.data.Ft1[4:6] .= missing
+	e3.data.Experiment[[5,10,12]] .= missing
+
+	mf1 = MissingFilter(:Ft1)
+	mf2 = MissingFilter()
+
+	@test filter_entries(e3, mf1) == [7,8,10,11]
+	@test filter_entries(e3, mf2) == [7,8,11]
 end
 
 @testset "Selector" begin
