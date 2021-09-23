@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v1.1.0 - 2021-09-23
+### Added
+- Option to remove R seed from distance computation
+- `most_variable_features` method
+- `characteristic_features` method
+- `most_correlated` method
+- MissingFilter structures 
+- `freqtable` support
+
 ## v1.0.1 - 2021-09-23
 ### Changed
 - Correct intermittent error due to singular covariant matrices in helliger distance computation
@@ -46,7 +55,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Experiment structures and normalization functions
 
-[1.0.1] https://github.com/menchelab/BioProfiling.jl/compare/v0.4.1...HEAD
+[1.1.0] https://github.com/menchelab/BioProfiling.jl/compare/v1.0.1...HEAD
+[1.0.1] https://github.com/menchelab/BioProfiling.jl/compare/v1.0.0...v1.0.1
 [1.0.0] https://github.com/menchelab/BioProfiling.jl/compare/v0.4.1...v1.0.0
 [0.4] https://github.com/menchelab/BioProfiling.jl/compare/v0.3.4...v0.4.1
 [0.3] https://github.com/menchelab/BioProfiling.jl/compare/v0.2.1...v0.3.4

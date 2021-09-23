@@ -32,6 +32,7 @@ abstract type AbstractReduce end
 abstract type AbstractFilter <: AbstractReduce end
 abstract type AbstractSimpleFilter <: AbstractFilter end
 abstract type AbstractCombinationFilter <: AbstractFilter end
+abstract type AbstractMissingFilter <: AbstractFilter end
 
 mutable struct Filter <: AbstractSimpleFilter
     value::Any
@@ -52,6 +53,14 @@ mutable struct CombinationFilter <: AbstractCombinationFilter
     operator::Function
 end
 
+mutable struct MissingFilter <: AbstractMissingFilter end
+
+# Constructor
+function MissingFilter(feature; 
+                        description = "No description provided")
+    return Filter(1, feature, (x,y) -> !ismissing(x), description)
+end
+
 # Methods
 
 """Return filtered entries in an Experiment `e` based on filter `f`
@@ -67,6 +76,10 @@ function filter_entries(e::AbstractExperiment, f::AbstractCombinationFilter)
     return(sort(f.operator(e1, e2)))
 end
 
+function filter_entries(e::AbstractExperiment, f::AbstractMissingFilter)
+    return(sort(∩([filter_entries(e, MissingFilter(f)) 
+                   for f in Symbol.(names(e.data)[e.selected_features])]...)))
+end
 
 """Filter entries in an Experiment `e` based on filter(s) `f`,
 updating `e.selected_entries` in place accordingly.

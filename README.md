@@ -17,7 +17,7 @@ This package allows to perform robust multidimensional profiling in 'Julia' and 
 
 ### Installation from Julia's package repository (easiest option)
 
-You can simply add this package from the Julia repository like for any other package:
+You can simply add this package from the Julia repository like any other package:
 
 ```julia
 import Pkg
@@ -45,7 +45,7 @@ import Pkg
 Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/BioProfiling.jl.git"))
 ```
 
-Use can then import the package:
+You can then import the package normally:
 
 ```julia
 using BioProfiling

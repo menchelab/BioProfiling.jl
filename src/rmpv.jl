@@ -93,8 +93,11 @@ end
 """ Compute the median Robust Mahalanobis Distance (RMD)
     in a dataset 'data' for a given perturbation of indices 'indpert' 
     compared to a reference of indices 'indref'.
-    See https://e-archivo.uc3m.es/bitstream/handle/10016/24613/ws201710.pdf """
-function distance_robust_mahalanobis_median(data, indpert, indref)
+    See https://e-archivo.uc3m.es/bitstream/handle/10016/24613/ws201710.pdf
+    This function calls R using RCall and a seed is set by default to ensure
+    the results are reproducible. If you don't want that, for instance if you
+    also use RCall and rely on another seed, set 'r_seed' to false."""
+function distance_robust_mahalanobis_median(data, indpert, indref; r_seed = true)
     setPert = data[indpert,:]
     setRef = data[indref,:] 
 
@@ -106,13 +109,14 @@ function distance_robust_mahalanobis_median(data, indpert, indref)
     
     # Compute Minimum Covariance Determinant and corresponding Robust Mahalanobis Distance
     @rput setRef
+    @rput r_seed
 
     R"""
     if (!require("robustbase")) install.packages("robustbase", 
                                 repos = "https://cloud.r-project.org")
     library(robustbase)
 
-    set.seed(777)
+    if (r_seed){set.seed(777)}
     mcd <- covMcd(setRef)
     mcdCenter <- mcd$center
     mcdCov <- mcd$cov
@@ -126,8 +130,11 @@ end
 
 """ Permute labels and compute the median Robust Mahalanobis Distance (RMD)
     in a dataset 'data' for a given perturbation of indices 'indpert' 
-    compared to a reference of indices 'indref', to create an empirical distribution."""
-function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_rep = 250)
+    compared to a reference of indices 'indref', to create an empirical distribution.
+    This function calls R using RCall and a seed is set by default to ensure
+    the results are reproducible. If you don't want that, for instance if you
+    also use RCall and rely on another seed, set 'r_seed' to false."""
+function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_rep = 250, r_seed = true)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = vcat(setRef, setPert)
@@ -150,13 +157,14 @@ function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_r
 
         # Compute Minimum Covariance Determinant and corresponding Robust Mahalanobis Distance
         @rput shuffSetRef
-        
+        @rput r_seed
+
         R"""
         if (!require("robustbase")) install.packages("robustbase", 
                                     repos = "https://cloud.r-project.org")
         library(robustbase)
 
-        set.seed(3895)
+        if (r_seed){set.seed(3895)}
         mcd <- covMcd(shuffSetRef)
         mcdCenter <- mcd$center
         mcdCov <- mcd$cov
@@ -173,8 +181,11 @@ end
 
 """ Compute the Robust Hellinger Distance (RHD)
     in a dataset `data` for a given perturbation of indices `indpert` 
-    compared to a reference of indices `indref`."""
-function distance_robust_hellinger(data, indpert, indref)
+    compared to a reference of indices `indref`.
+    This function calls R using RCall and a seed is set by default to ensure
+    the results are reproducible. If you don't want that, for instance if you
+    also use RCall and rely on another seed, set 'r_seed' to false."""
+function distance_robust_hellinger(data, indpert, indref; r_seed = true)
     setPert = data[indpert,:]
     setRef = data[indref,:] 
 
@@ -187,13 +198,14 @@ function distance_robust_hellinger(data, indpert, indref)
     # Compute Minimum Covariance Determinant and corresponding Robust Hellinger Distance
     @rput setRef
     @rput setPert
+    @rput r_seed
 
     R"""
     if (!require("robustbase")) install.packages("robustbase", 
                                 repos = "https://cloud.r-project.org")
     library(robustbase)
 
-    set.seed(777)
+    if (r_seed){set.seed(777)}
     mcd1 <- covMcd(setRef)
     mcdCenter1 <- mcd1$center
     mcdCov1 <- mcd1$cov
@@ -201,7 +213,7 @@ function distance_robust_hellinger(data, indpert, indref)
     # We set the seed twice to always
     # find the same estimators given
     # the same sample
-    set.seed(777)
+    if (r_seed){set.seed(777)}
     mcd2 <- covMcd(setPert)
     mcdCenter2 <- mcd2$center
     mcdCov2 <- mcd2$cov
@@ -217,8 +229,11 @@ end
 
 """ Permute labels and compute the Robust Hellinger Distance (RHD)
     in a dataset `data` for a given perturbation of indices `indpert` 
-    compared to a reference of indices `indref`, to create an empirical distribution."""
-function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250)
+    compared to a reference of indices `indref`, to create an empirical distribution.
+    This function calls R using RCall and a seed is set by default to ensure
+    the results are reproducible. If you don't want that, for instance if you
+    also use RCall and rely on another seed, set 'r_seed' to false."""
+function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250, r_seed = true)
     setPert = data[indpert,:]
     setRef = data[indref,:]  
     set = vcat(setRef, setPert)
@@ -242,13 +257,14 @@ function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250)
         # Compute Minimum Covariance Determinant and corresponding Robust Mahalanobis Distance
         @rput shuffSetRef
         @rput shuffSetPert
+        @rput r_seed
         
         R"""
         if (!require("robustbase")) install.packages("robustbase", 
                                     repos = "https://cloud.r-project.org")
         library(robustbase)
 
-        set.seed(777)
+        if (r_seed){set.seed(777)}
         mcd <- covMcd(shuffSetRef)
         mcdCenter1 <- mcd$center
         mcdCov1 <- mcd$cov
@@ -256,7 +272,7 @@ function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250)
         # We set the seed twice to always
         # find the same estimators given
         # the same sample
-        set.seed(777)
+        if (r_seed){set.seed(777)}
         mcd <- covMcd(shuffSetPert)
         mcdCenter2 <- mcd$center
         mcdCov2 <- mcd$cov
@@ -289,6 +305,10 @@ end
     `nb_rep` times.
     If `process_pool` is a pool of worker processes, they will
     be used for parallel computation in the permutation test.
+    This function might call R using RCall and a seed is set by default
+    to ensure the results are reproducible. If you don't want that, for 
+    instance if you also use RCall and rely on another seed, set 'r_seed'
+    to false.
     This returns a DataFrame with three columns:
     * `Condition`: the levels in `s`
     * `Distance`: the distance between a condition and the 
@@ -304,13 +324,18 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
                                                  f::AbstractFilter; 
                                                  nb_rep::Int64 = 250,
                                                  dist::Symbol = :RobHellinger,
-                                                 process_pool = nothing)
+                                                 process_pool = nothing,
+                                                 r_seed = true)
     if dist == :RobHellinger
-        selected_distance = distance_robust_hellinger
-        shuffled_distance = shuffled_distance_robust_hellinger 
+        selected_distance = (x...; kw...)->distance_robust_hellinger(x...;
+                                                                     r_seed = r_seed, kw...)
+        shuffled_distance = (x...; kw...)->shuffled_distance_robust_hellinger(x...;
+                                                                     r_seed = r_seed, kw...)
     elseif dist == :RobMedMahalanobis
-        selected_distance = distance_robust_mahalanobis_median
-        shuffled_distance = shuffled_distance_robust_mahalanobis_median
+        selected_distance = (x...; kw...)->distance_robust_mahalanobis_median(x...;
+                                                                     r_seed = r_seed, kw...)
+        shuffled_distance = (x...; kw...)->shuffled_distance_robust_mahalanobis_median(x...;
+                                                                     r_seed = r_seed, kw...)
     elseif dist == :MedMahalanobis
         selected_distance = distance_mahalanobis_median
         shuffled_distance = shuffled_distance_mahalanobis_median
@@ -374,13 +399,15 @@ function robust_morphological_perturbation_value(e::AbstractExperiment,
                                                  ref; 
                                                  nb_rep::Int64 = 250,
                                                  dist::Symbol = :RobHellinger,
-                                                 process_pool = nothing)
+                                                 process_pool = nothing,
+                                                 r_seed = true)
     ref_filter = Filter(ref, s)
     return(robust_morphological_perturbation_value(e, 
                                                    s, 
                                                    ref_filter;
                                                    nb_rep=nb_rep,
                                                    dist=dist,
-                                                   process_pool=process_pool))
+                                                   process_pool=process_pool,
+                                                   r_seed=r_seed))
 end
 

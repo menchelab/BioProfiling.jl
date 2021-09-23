@@ -10,6 +10,7 @@ export  logtransform,
         hellinger, 
         Filter, 
         CombinationFilter, 
+        MissingFilter, 
         Experiment, 
         filter_entries!, 
         filter_entries,
@@ -34,17 +35,23 @@ export  logtransform,
         shuffled_distance_mahalanobis_median,
         distance_mahalanobis_median,
         robust_morphological_perturbation_value,
+        most_variable_features,
+        characteristic_features,
+        most_correlated,
+        freqtable,
         umap
 using Statistics, StatsBase, DataFrames, Images, ImageMagick, UMAP, RCall, MultipleTesting
-using Distributed, ParallelDataTransfer
+using Distributed, ParallelDataTransfer, FreqTables
 
 using LinearAlgebra: det
 
 include("struct.jl")
+include("internal.jl")
 include("transform.jl")
 include("distances.jl")
 include("diagnostic.jl")
 include("visu.jl")
 include("rmpv.jl")
+include("interpret.jl")
 
 end # module

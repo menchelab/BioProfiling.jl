@@ -9,6 +9,30 @@ using RCall
 using Distributed
 using ParallelDataTransfer
 
+@testset "freqtable" begin
+	d = DataFrame(Any[0.05131 0.32830 "Exp1"; 0.83296 0.97647 "Exp1"; 0.66463 0.66939 "Exp2"; 
+	                  0.30651 0.58938 "Exp2"; 0.71313 0.18477 "Exp2"; 0.81810 0.16309 "Exp2"; 
+	                  0.05657 0.06012 "Exp1"; 0.02205 0.17055 "Exp2"; 0.49819 0.91871 "Exp1"; 
+	                  0.90857 0.18794 "Exp2"; 0.12327 0.00619 "Exp2"; 0.34146 0.62640 "Exp1"])
+	rename!(d, [:Ft1, :Ft2, :Experiment])
+
+	e1 = Experiment(d, description = "Test Experiment")
+
+	d1 = "Reject cells with high Ft2 values"
+	f1 = Filter(0.9, :Ft2, compare = isless, 
+	            description = d1)
+
+	@test freqtable(e1, f1) == [2,10]
+	filter_entries!(e1, f1)
+
+	d2 = "Select only a single experiment"
+    f2 = Filter("Exp1", :Experiment, description = d2)
+
+    @test freqtable(e1, f2) == [7,3]
+
+    @test freqtable(e1, :Experiment) == [3,7]
+end
+
 @testset "decorrelate" begin
     X = DataFrame([[1,2,3],[3,2,1],[0,1,2],[1,0,1]])
     @test decorrelate(X) == [1,4]
@@ -127,6 +151,20 @@ end
 	# Additional checks that could be performed:
 	# Filter.compare::Function -> Make sure it takes 2 arguments and return 1?
 	# CombinationFilter.operator::Function -> Make sure it takes 2 lists and return 1?
+
+	filter_entries!(e3, f2)
+
+	# Add missing values
+	e3.data.Ft1 = Array{Union{Missing, Float64},1}(e3.data.Ft1)
+	e3.data.Experiment = Array{Union{Missing, String},1}(e3.data.Experiment)	
+	e3.data.Ft1[4:6] .= missing
+	e3.data.Experiment[[5,10,12]] .= missing
+
+	mf1 = MissingFilter(:Ft1)
+	mf2 = MissingFilter()
+
+	@test filter_entries(e3, mf1) == [7,8,10,11]
+	@test filter_entries(e3, mf2) == [7,8,11]
 end
 
 @testset "Selector" begin
@@ -244,6 +282,54 @@ end
 	# colimgifrgb [internal]
 	# rgb parameters of diagnostic_images
 	# output of diagnostic_images
+end
+
+@testset "interpret" begin
+	# Define example dataset
+	d = DataFrame([[0,2,4,6,8,21],[0,1,2,3,4,0],[0,3,6,9,12,3],'A':'F'])
+	rename!(d, [Symbol.("Ft".*string.(1:3))..., :Class])
+
+	f1 = Filter('F', :Class, compare = !=, description = "Exclude row")
+	s1 = NameSelector(x -> occursin("Ft", String(x)), "Keep numerical features")
+
+	e = Experiment(d)
+	select!(e, [f1,s1])
+
+	@test most_variable_features(e) == ["Ft3", "Ft1", "Ft2"]
+
+	# Test equivalence to sorting by mad
+	top1ft = most_variable_features(e, top = 1)
+	decorrelate_by_mad!(e)
+	@test names(e.data)[e.selected_features] == top1ft
+
+    d = DataFrame(rand(120,3))
+	rename!(d, Symbol.("Ft".*string.(1:3)))
+	d.Class = repeat(["Ref", "A", "B"], 40)
+
+	# Add specific differences for each class
+	d[d.Class .== "A",:Ft2] .+= 2;
+	d[d.Class .== "B",:Ft3] .+= 2;
+
+	f1 = Filter(0.9, :Ft1, compare = <=, description = "Exclude 10% of entries")
+	s1 = NameSelector(x -> occursin("Ft", String(x)), "Keep numerical features")
+
+	e = Experiment(d)
+	select!(e, [f1,s1])
+
+	filt_Ref = Filter("Ref", :Class)
+	filt_A = Filter("A", :Class)
+	filt_B = Filter("B", :Class)
+
+	@test characteristic_features(e, filt_Ref, filt_A, top = 1) == ["Ft2"]
+	@test characteristic_features(e, filt_Ref, filt_B, top = 1) == ["Ft3"]
+	@test characteristic_features(e, filt_A, filt_B)[3] == "Ft1"
+	@test characteristic_features(e, filt_A, filt_B) == characteristic_features(e, filt_B, filt_A)
+
+	correlated_ref = 3 .* getdata(e).Ft2;
+	@test most_correlated(e, correlated_ref, top = 1)[1] == "Ft2"
+	@test most_correlated(e, :Ft1)[1] == "Ft1"
+	e.data.Ft2 .-= 2 .* e.data.Ft3
+	@test most_correlated(e, :Ft3) == ["Ft3", "Ft2", "Ft1"]
 end
 
 @testset "negation" begin
@@ -394,6 +480,39 @@ end
 	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
 	decorrelate_by_mad!(e5)
 	@test e5.selected_features == [3]
+
+	# Test type issues
+	d.Ft4 = [collect(1:9)..., missing, Inf, NaN]
+	e5 = Experiment(d)
+
+	# Includes String column
+	@test_throws AssertionError decorrelate!(e5)
+
+	filter!(e5,[f1,s1])
+	decorrelate!(e5) # This should now work
+	append!(e5.selected_features, 5)
+
+	# Includes Inf values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[11,5] = 3
+	e6 = deepcopy(e5)
+	decorrelate!(e6) # This should now work
+	append!(e5.selected_entries, 10)
+
+	# Includes Missing values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[10,5] = 3
+	e6 = deepcopy(e5)
+	decorrelate!(e6) # This should now work
+	append!(e5.selected_entries, 12)
+
+	# Includes NaN values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[12,5] = 3
+	decorrelate!(e5) # This should now work
 
 	# Test handling of non-float variables
 	d.Ft2 = rand(1:4, size(d,1))
@@ -595,6 +714,53 @@ end
 	# A, B and C have the same distribution but D has a different one
 	@test rmpv4.RMPV[rmpv4.Condition .== 'C'][1] > 0.1
 	@test rmpv4.RMPV[rmpv4.Condition .== 'D'][1] < 0.1
+
+	# Test reproducibility
+    Random.seed!(777)
+    rmpv_run1 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobMedMahalanobis)
+    Random.seed!(777)
+    rmpv_run2 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobMedMahalanobis)
+    Random.seed!(777)
+    rmpv_run3 = robust_morphological_perturbation_value(e, 
+                                                    :Condition, 
+                                                    'C', 
+                                                    nb_rep = 4, 
+                                                    dist = :RobMedMahalanobis,
+                                                    r_seed = false)
+    @test rmpv_run1 == rmpv_run2
+    # NB: without changing the seeds, it is possible that
+    # the MCD converges so the following is a bad test:
+    # @test rmpv_run1 != rmpv_run3
+
+    Random.seed!(777)
+    rmpv_run1 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobHellinger)
+    Random.seed!(777)
+    rmpv_run2 = robust_morphological_perturbation_value(e, 
+                                                        :Condition, 
+                                                        'C', 
+                                                        nb_rep = 4, 
+                                                        dist = :RobHellinger)
+    Random.seed!(777)
+    rmpv_run3 = robust_morphological_perturbation_value(e, 
+                                                    :Condition, 
+                                                    'C', 
+                                                    nb_rep = 4, 
+                                                    dist = :RobHellinger,
+                                                    r_seed = false)
+    @test rmpv_run1 == rmpv_run2
+    # @test rmpv_run1 != rmpv_run3
 end
 
 @testset "parallel_rmpv" begin
