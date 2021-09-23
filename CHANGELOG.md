@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Continuous integration on MacOS
 - Continuous integration on Ubuntu
 - Test coverage through Codecov
+- Support floats for center coordinates in visual diagnostic methods
 
 ## v1.0.0 - 2021-05-01
 ### Changed

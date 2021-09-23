@@ -43,7 +43,8 @@ function diagnostic_path(e::Experiment,
             if rgx !== nothing
                 url = reduce(replace, rgx, init=url)
             end
-            diagURLtoCenters[url] = vcat(diagURLtoCenters[url],  [[cx,nx] [cy,ny]])
+            diagURLtoCenters[url] = vcat(diagURLtoCenters[url],  
+                                         [[round(cx),round(nx)] [round(cy),round(ny)]])
         end
         return((diagURL, map(x -> diagURLtoCenters[x], diagURL)))
     end
