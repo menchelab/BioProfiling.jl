@@ -32,3 +32,14 @@ function _assert_clean_data(e::Experiment)
 	@assert hasnoinf "Selected data include Inf values."
 end
 
+"""[intended for internal use only]
+Convert all selected data columns to floats
+"""
+function _data_to_float!(e::Experiment)
+    # Make sure all values are numbers
+    @assert all( [x <: Number for x in eltype.(eachcol(getdata(e)))] )
+    # Convert each column to floats
+    for colname in names(getdata(e))
+        e.data[!,colname] = float.(e.data[:,colname])
+    end
+end

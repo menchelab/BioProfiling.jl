@@ -467,9 +467,13 @@ end
 	decorrelate!(e4, ordercol = [4,3,2,1])
 	# Reversed order: first column always kept, inverse column removed
 	@test 5 in e4.selected_features
-	if cor(getdata(e4).Ft4, getdata(e4).Ft3) < 0.8
+	if cor(e4.data[e4.selected_entries, :Ft4], 
+		   e4.data[e4.selected_entries, :Ft3]) < 0.8
 		@test 4 in e4.selected_features
+	else
+		@test !(4 in e4.selected_features)
 	end
+
 	@test !(1 in e4.selected_features)
 
 	# Test sorting by mad
@@ -509,6 +513,26 @@ end
 
 	e5.data[12,5] = 3
 	decorrelate!(e5) # This should now work
+
+	# Test handling of non-float variables
+	d.Ft2 = rand(1:4, size(d,1))
+	e5 = Experiment(d)
+
+	thr = sort(getdata(e5).Intensity_MedianIntensity_NeurDensity)[end-2]
+	f3 = Filter(thr, :Intensity_MedianIntensity_NeurDensity, 
+	       compare = >=, description = "Top 3 values")
+
+	@test_throws AssertionError logtransform!(e5)
+	@test_throws AssertionError normtransform!(e5,f3)
+
+	filter!(e5,[s1])
+
+	e6 = deepcopy(e5)
+	logtransform!(e5)
+	normtransform!(e6,f3)
+
+	@test eltype(getdata(e5).Ft2) == Float64
+	@test eltype(getdata(e6).Ft2) == Float64
 end
 
 @testset "umap" begin
