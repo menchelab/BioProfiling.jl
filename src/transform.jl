@@ -65,6 +65,7 @@ decorrelate(data::AbstractMatrix; ordercol = nothing, threshold = 0.8) =
     a given order 'ordercol' (defaults to left to right).
 """
 function decorrelate!(e::Experiment; ordercol = nothing, threshold = 0.8)
+    _assert_clean_data(e)
     e.selected_features = e.selected_features[decorrelate(getdata(e), 
                                                         ordercol=ordercol,
                                                         threshold=threshold)]
@@ -75,6 +76,7 @@ end
     with largest median absolute deviation.
 """
 function decorrelate_by_mad!(e::Experiment; threshold = 0.8)
+    _assert_clean_data(e)
     # Order features from biggest mad to smallest mad
     # When features have mad(reference) = 1, it means that we rank features 
     # by how more variable they are overall compared to the reference

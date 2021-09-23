@@ -476,6 +476,39 @@ end
 	e5 = Experiment(DataFrame([[0,2,4,6,8],[0,1,2,3,4],[0,3,6,9,12]]))
 	decorrelate_by_mad!(e5)
 	@test e5.selected_features == [3]
+
+	# Test type issues
+	d.Ft4 = [collect(1:9)..., missing, Inf, NaN]
+	e5 = Experiment(d)
+
+	# Includes String column
+	@test_throws AssertionError decorrelate!(e5)
+
+	filter!(e5,[f1,s1])
+	decorrelate!(e5) # This should now work
+	append!(e5.selected_features, 5)
+
+	# Includes Inf values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[11,5] = 3
+	e6 = deepcopy(e5)
+	decorrelate!(e6) # This should now work
+	append!(e5.selected_entries, 10)
+
+	# Includes Missing values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[10,5] = 3
+	e6 = deepcopy(e5)
+	decorrelate!(e6) # This should now work
+	append!(e5.selected_entries, 12)
+
+	# Includes NaN values
+	@test_throws AssertionError decorrelate!(e5)
+
+	e5.data[12,5] = 3
+	decorrelate!(e5) # This should now work
 end
 
 @testset "umap" begin

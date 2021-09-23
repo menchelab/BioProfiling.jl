@@ -46,6 +46,7 @@ using Distributed, ParallelDataTransfer, FreqTables
 using LinearAlgebra: det
 
 include("struct.jl")
+include("internal.jl")
 include("transform.jl")
 include("distances.jl")
 include("diagnostic.jl")
