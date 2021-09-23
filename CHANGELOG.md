@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v1.0.1 - 2021-09-23
 ### Changed
 - Correct intermittent error due to singular covariant matrices in helliger distance computation
 - Convert columns to float if need for data log-transformation and normalization
@@ -46,8 +46,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Experiment structures and normalization functions
 
-[1.0.0] https://github.com/menchelab/RMP.jl/compare/v0.4.1...HEAD
-[0.4] https://github.com/menchelab/RMP.jl/compare/v0.3.4...v0.4.1
-[0.3] https://github.com/menchelab/RMP.jl/compare/v0.2.1...v0.3.4
-[0.2] https://github.com/menchelab/RMP.jl/compare/v0.1.2...v0.2.1
-[0.1] https://github.com/menchelab/RMP.jl/tree/v0.1.2
+[1.0.1] https://github.com/menchelab/BioProfiling.jl/compare/v0.4.1...HEAD
+[1.0.0] https://github.com/menchelab/BioProfiling.jl/compare/v0.4.1...v1.0.0
+[0.4] https://github.com/menchelab/BioProfiling.jl/compare/v0.3.4...v0.4.1
+[0.3] https://github.com/menchelab/BioProfiling.jl/compare/v0.2.1...v0.3.4
+[0.2] https://github.com/menchelab/BioProfiling.jl/compare/v0.1.2...v0.2.1
+[0.1] https://github.com/menchelab/BioProfiling.jl/tree/v0.1.2

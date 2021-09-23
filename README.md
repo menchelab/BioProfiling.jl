@@ -48,7 +48,7 @@ Pkg.add(Pkg.PackageSpec(url = "https://github.com/menchelab/BioProfiling.jl.git"
 Use can then import the package:
 
 ```julia
-	using BioProfiling
+using BioProfiling
 ```
 
 ## Learn more
