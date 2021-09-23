@@ -736,7 +736,9 @@ end
                                                     dist = :RobMedMahalanobis,
                                                     r_seed = false)
     @test rmpv_run1 == rmpv_run2
-    @test rmpv_run1 != rmpv_run3
+    # NB: without changing the seeds, it is possible that
+    # the MCD converges so the following is a bad test:
+    # @test rmpv_run1 != rmpv_run3
 
     Random.seed!(777)
     rmpv_run1 = robust_morphological_perturbation_value(e, 
