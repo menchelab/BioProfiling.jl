@@ -6,7 +6,7 @@
 [![CI](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml/badge.svg)](https://github.com/menchelab/BioProfiling.jl/actions/workflows/NightlyCI.yml)
 [![codecov](https://codecov.io/gh/menchelab/BioProfiling.jl/branch/master/graph/badge.svg?token=JE1KSLYYR6)](https://codecov.io/gh/menchelab/BioProfiling.jl)
 
-Robust multidimensional profiling to quantify complex changes via the minimum covariance determinant.
+A flexible Julia toolkit for high-dimensional cellular profiles
 ---
 
 ## Introduction
