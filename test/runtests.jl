@@ -786,3 +786,19 @@ end
 	# 4 conditions, 3 columns
 	@test size(rmpv) == (4,3)
 end
+
+@testset "MembershipFilter" begin
+	d = DataFrame(:Ft1 => repeat(["A", "B", "C"], 4),
+                  :Ft2 => 1:12)
+
+	e = Experiment(d)
+
+	in_filter = MembershipFilter(("A", "C"), :Ft1)
+	@test length(filter_entries(e, in_filter)) == 8
+
+	notB_filter = negation(Filter("B",:Ft1))
+	@test filter_entries(e, in_filter) == filter_entries(e, notB_filter)
+
+	in_filter2 = MembershipFilter(["A", "C"], :Ft2)
+	@test length(filter_entries(e, in_filter2)) == 0
+end

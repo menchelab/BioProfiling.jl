@@ -43,3 +43,10 @@ function _data_to_float!(e::Experiment)
         e.data[!,colname] = float.(e.data[:,colname])
     end
 end
+
+"""[intended for internal use only]
+Check if each element of `x` is in `y`.
+See `?in` for more explanations.
+"""
+_compare_in(x,y) = x in y
+Broadcast.broadcasted(::typeof(_compare_in), x, y) = broadcast(in, x, Ref(y))

@@ -32,7 +32,8 @@ abstract type AbstractReduce end
 abstract type AbstractFilter <: AbstractReduce end
 abstract type AbstractSimpleFilter <: AbstractFilter end
 abstract type AbstractCombinationFilter <: AbstractFilter end
-abstract type AbstractMissingFilter <: AbstractFilter end
+# Unused type - can probably be removed in next major release
+abstract type AbstractMissingFilter <: AbstractFilter end 
 
 mutable struct Filter <: AbstractSimpleFilter
     value::Any
@@ -53,12 +54,26 @@ mutable struct CombinationFilter <: AbstractCombinationFilter
     operator::Function
 end
 
+# Unused type - can probably be removed in next major release
 mutable struct MissingFilter <: AbstractMissingFilter end
 
-# Constructor
+# Special filters
+"""
+Returns a Filter object excluding rows having missing values
+for a given `feature`.
+"""
 function MissingFilter(feature; 
-                        description = "No description provided")
+                        description = "Remove missing values")
     return Filter(1, feature, (x,y) -> !ismissing(x), description)
+end
+
+"""
+Returns a Filter object excluding rows in which the values for a  
+given `feature` are elements in `collection` (set membership).
+"""
+function MembershipFilter(collection, feature; 
+                        description = "Keep entries with specific values")
+    return Filter(collection, feature, _compare_in, description)
 end
 
 # Methods
