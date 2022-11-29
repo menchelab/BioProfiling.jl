@@ -113,7 +113,7 @@ function distance_robust_mahalanobis_median(data, indpert, indref; r_seed = true
 
     R"""
     if (!require("robustbase")) install.packages("robustbase", 
-                                repos = "https://cloud.r-project.org")
+                                repos = "http://cloud.r-project.org")
     library(robustbase)
 
     if (r_seed){set.seed(777)}
@@ -161,7 +161,7 @@ function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_r
 
         R"""
         if (!require("robustbase")) install.packages("robustbase", 
-                                    repos = "https://cloud.r-project.org")
+                                    repos = "http://cloud.r-project.org")
         library(robustbase)
 
         if (r_seed){set.seed(3895)}
@@ -202,7 +202,7 @@ function distance_robust_hellinger(data, indpert, indref; r_seed = true)
 
     R"""
     if (!require("robustbase")) install.packages("robustbase", 
-                                repos = "https://cloud.r-project.org")
+                                repos = "http://cloud.r-project.org")
     library(robustbase)
 
     if (r_seed){set.seed(777)}
@@ -261,7 +261,7 @@ function shuffled_distance_robust_hellinger(data, indpert, indref; nb_rep = 250,
         
         R"""
         if (!require("robustbase")) install.packages("robustbase", 
-                                    repos = "https://cloud.r-project.org")
+                                    repos = "http://cloud.r-project.org")
         library(robustbase)
 
         if (r_seed){set.seed(777)}

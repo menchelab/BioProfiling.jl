@@ -605,7 +605,7 @@ end
 	# Robustbase must be installed
 	R"""
 	if (!require("robustbase")) install.packages("robustbase", 
-												  repos = "https://cloud.r-project.org")
+												  repos = "http://cloud.r-project.org")
 	library(robustbase)
 	"""
 	d = rand(100,5)
@@ -764,15 +764,22 @@ end
 end
 
 @testset "parallel_rmpv" begin
+	"""
+	Warning: this is resource intensive!
+	Running it on the default 2- or 4-core machines in Github 
+	codespaces lead to an error (a KILL signal is sent). 
+	This should work well with 8-core machines.
+	You might want to skip it in your routine checks.
+	It is best including it in the actual checks in CI anyway.
+	"""
 	d = DataFrame(rand(100,5))
 	d.Condition = sample('A':'D', 100);
 
 	e = Experiment(d)
 
-    addprocs(4)
+    addprocs(4, exeflags="--project=$(Base.active_project())")
     pool = CachingPool(workers())
     @everywhere using BioProfiling
-
 
 	slt = NameSelector(x -> x != "Condition")
 	select_features!(e, slt)
