@@ -32,7 +32,8 @@ All tests should pass for the supported versions of Julia and the package's depe
 
 ## Development environment
 
-BioProfiling.jl is intended to be compatible with a large set of environments as detailed in [Project.toml](Project.toml). If you need to setup a development environment, an easy solution is to start from the [latest Docker image designed to run the example notebooks](https://hub.docker.com/r/koalive/bioprofilingnotebooks), which comes with all dependencies installed. To avoid inteferences between the pre-installed version of BioProfiling.jl and your local version of the source code, you can remove the version installed in the container with the following lines:
+BioProfiling.jl is intended to be compatible with a large set of environments as detailed in [Project.toml](Project.toml). If you need to setup a development environment, an easy solution is to **edit and run code directly in your browser thanks to GitHub codespaces**. Some instructions are available in [our documentation](https://menchelab.github.io/BioProfiling.jl/dev/).  
+Another option is to start from the [latest **Docker image** designed to run the example notebooks](https://hub.docker.com/r/koalive/bioprofilingnotebooks), which comes with all dependencies installed. To avoid inteferences between the pre-installed version of BioProfiling.jl and your local version of the source code, you can remove the version installed in the container with the following lines:
 
 ```julia
 import Pkg
