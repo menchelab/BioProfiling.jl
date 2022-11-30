@@ -8,6 +8,8 @@ using Random
 using RCall
 using Distributed
 using ParallelDataTransfer
+using Images
+
 
 @testset "freqtable" begin
 	d = DataFrame(Any[0.05131 0.32830 "Exp1"; 0.83296 0.97647 "Exp1"; 0.66463 0.66939 "Exp2"; 
@@ -278,10 +280,36 @@ end
 	@test diagnostic_images(e1, cf1, :Experiment, rgx = [r".*" => s"example.png"], saveimages = false)
 	# Additional checks that could be performed:
 	# Centers of diagnostic_path
-	# getColorImage [internal]
-	# colimgifrgb [internal]
 	# rgb parameters of diagnostic_images
 	# output of diagnostic_images
+end
+
+@testset "tiff" begin
+	# Test TIF images at 8, 16 or 32 bits, RGB or single channel
+    i8 = load("example8b.tiff")
+    i16 = load("example16b.tiff")
+    i32 = load("example32b.tiff")
+	pathbw = "example32b_bw.tiff"
+    i32bw = load(pathbw)
+
+	# Images are not empty
+	@test all([sum(channelview(x)) > 0 for x in [i8, i16, i32, i32bw] ])
+	# Black-and-white image should correspond to the second channel of i32
+	@test channelview(i32bw) == channelview(i32)[2,:,:]
+
+	i32_fakergb = BioProfiling.getColorImage(pathbw, pathbw, pathbw)
+	@test channelview(i32_fakergb)[1,:,:] == channelview(i32_fakergb)[2,:,:] == channelview(i32_fakergb)[3,:,:]
+	# All pixel intensities should be normalized by the same amount
+	ratio_intensity = float(channelview(i32_fakergb)[3,6,6]) ./ channelview(i32bw)[6,6]
+	@test all([isapprox(channelview(i32bw)[x,y] * ratio_intensity, 
+				  channelview(i32_fakergb)[3,x,y], 
+				  atol = 2/(2^32))
+		 for x in 1:32 for y in 1:96])
+
+	@test_throws ArgumentError BioProfiling.colimgifrgb("not_a_path", nothing)
+	# Should load images as in getColorImage and support regex for RGB images
+	@test BioProfiling.colimgifrgb(pathbw, nothing) == i32bw
+	@test BioProfiling.colimgifrgb(pathbw, ["", "", ""]) == i32_fakergb
 end
 
 @testset "interpret" begin
