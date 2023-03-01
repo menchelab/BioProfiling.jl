@@ -102,7 +102,7 @@ function distance_robust_mahalanobis_median(data, indpert, indref; r_seed = true
     setRef = data[indref,:] 
 
     # Ensure that we have enough points to compute distance
-    if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
+    if size(setRef)[1] < 2*size(data, 2)
         return(missing)
     end
     # NB: having less points than twice the number of dimensions leads to singularity
@@ -144,7 +144,7 @@ function shuffled_distance_robust_mahalanobis_median(data, indpert, indref; nb_r
     nref = size(setRef, 1)
     
     # Ensure that we have enough points to compute distance
-    if ((size(setPert)[1] < 2*size(data, 2))|(size(setRef)[1] < 2*size(data, 2)))
+    if size(setRef)[1] < 2*size(data, 2)    
         return(repeat([missing], nb_rep))
     end
     # NB: having less points than twice the number of dimensions leads to singularity
