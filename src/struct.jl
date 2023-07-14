@@ -32,6 +32,7 @@ abstract type AbstractReduce end
 abstract type AbstractFilter <: AbstractReduce end
 abstract type AbstractSimpleFilter <: AbstractFilter end
 abstract type AbstractCombinationFilter <: AbstractFilter end
+abstract type AbstractNullFilter <: AbstractFilter end
 # Unused type - can probably be removed in next major release
 abstract type AbstractMissingFilter <: AbstractFilter end 
 
@@ -52,6 +53,10 @@ mutable struct CombinationFilter <: AbstractCombinationFilter
     filter1::AbstractFilter
     filter2::AbstractFilter
     operator::Function
+end
+
+mutable struct NullFilter <: AbstractNullFilter
+    description::String
 end
 
 # Unused type - can probably be removed in next major release
@@ -76,6 +81,13 @@ function MembershipFilter(collection, feature;
     return Filter(collection, feature, _compare_in, description)
 end
 
+"""
+Returns a Filter object not excluding any row.
+"""
+function NullFilter(;description = "Keep all entries")
+    return NullFilter(description)
+end
+
 # Methods
 
 """Return filtered entries in an Experiment `e` based on filter `f`
@@ -94,6 +106,10 @@ end
 function filter_entries(e::AbstractExperiment, f::AbstractMissingFilter)
     return(sort(∩([filter_entries(e, MissingFilter(f)) 
                    for f in Symbol.(names(e.data)[e.selected_features])]...)))
+end
+
+function filter_entries(e::AbstractExperiment, f::AbstractNullFilter)
+    return(e.selected_entries)
 end
 
 """Filter entries in an Experiment `e` based on filter(s) `f`,

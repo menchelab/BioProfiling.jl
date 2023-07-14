@@ -804,9 +804,28 @@ end
                                                     dist = :RobHellinger,
                                                     r_seed = false)
     @test rmpv_run1 == rmpv_run2
-    # @test rmpv_run1 != rmpv_run3
 end
 
+@testset "NullFilter" begin
+	d = DataFrame(rand(50,3))
+    rename!(d, [:A, :B, :C])
+	e = Experiment(d)
+
+    nf = NullFilter()
+    @test filter_entries(e, nf) == e.selected_entries
+
+    valf1 = Filter(0.5, :B, compare = >, 
+        description = "Sample some entries")
+
+    filter!(e, valf1)
+    @test filter_entries(e, nf) == e.selected_entries
+
+    valf2 = Filter(0.5, :C, compare = >, 
+        description = "Sample some more entries")
+    combf = CombinationFilter(valf2, nf, ∩)
+    @test filter_entries(e, combf) == filter_entries(e, valf2)
+end  
+    
 @testset "parallel_rmpv" begin
 	"""
 	Warning: this is resource intensive!
@@ -837,3 +856,4 @@ end
 	# 4 conditions, 3 columns
 	@test size(rmpv) == (4,3)
 end
+
