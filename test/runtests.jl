@@ -360,6 +360,52 @@ end
 	@test most_correlated(e, :Ft3) == ["Ft3", "Ft2", "Ft1"]
 end
 
+@testset "nullreducers" begin
+	d = DataFrame(rand(50,3))
+    rename!(d, [:A, :B, :C])
+	e = Experiment(d)
+
+    nf = NullFilter()
+    @test filter_entries(e, nf) == e.selected_entries
+
+    ns = NullSelector()
+    @test select_features(e, ns) == e.selected_features
+
+    valf1 = Filter(0.5, :B, compare = >, 
+        description = "Sample some entries")
+
+    nams1 = NameSelector(x -> x != "A")
+
+    filter!(e, [valf1, nams1])
+    @test filter_entries(e, nf) == e.selected_entries
+    @test select_features(e, ns) == e.selected_features
+
+    valf2 = Filter(0.5, :C, compare = >, 
+        description = "Sample some more entries")
+    combf = CombinationFilter(valf2, nf, ∩)
+    @test filter_entries(e, combf) == filter_entries(e, valf2)
+
+    nams2 = NameSelector(x -> x == "B")
+    combs = CombinationSelector(nams2, ns, ∩)
+    @test select_features(e, combs) == select_features(e, nams2)
+end 
+
+@testset "MembershipFilter" begin
+	d = DataFrame(:Ft1 => repeat(["A", "B", "C"], 4),
+                  :Ft2 => 1:12)
+
+	e = Experiment(d)
+
+	in_filter = MembershipFilter(("A", "C"), :Ft1)
+	@test length(filter_entries(e, in_filter)) == 8
+
+	notB_filter = negation(Filter("B",:Ft1))
+	@test filter_entries(e, in_filter) == filter_entries(e, notB_filter)
+
+	in_filter2 = MembershipFilter(["A", "C"], :Ft2)
+	@test length(filter_entries(e, in_filter2)) == 0
+end
+
 @testset "negation" begin
 	# Define example dataset
 	d = DataFrame(Any[0.0513198 0.328301 "Exp1"; 0.832986 0.976474 "Exp1"; 0.664634 0.669392 "Exp2"; 
@@ -380,15 +426,12 @@ end
 	f1 = Filter("Exp1", :Experiment, description = d1)
 	nf1 = negation(f1)
 
-	@test nf1.description == "Do not "*f1.description
 	@test all(e1.data.Experiment[filter_entries(e1, f1)] .== "Exp1")
 	@test all(e1.data.Experiment[filter_entries(e1, nf1)] .== "Exp2")
 
 	# Test negation of simple selector
 	s1 = Selector(x -> eltype(x) <: Number, description = "Keep numeric features")
 	ns1 = negation(s1)
-
-	@test ns1.description == "Do not "*s1.description
 
 	ft_ns1 = select_features(e1, ns1)
 	@test ft_ns1 == [3]
@@ -400,29 +443,37 @@ end
 	s2 = NameSelector(x -> occursin("Ft1", String(x)), "Keep Ft1")
 	ns2 = negation(s2)
 
-	@test ns2.description == "Do not "*s2.description
-
 	ft_ns2 = select_features(e1, ns2)
 	@test ft_ns2 == [2,3]
 	# The union of the columns selected by a selector and its negation should be the set of all columns
 	append!(ft_ns2, select_features(e1, s2))
 	@test Set(ft_ns2) == Set(1:ncol(e1.data))
-end
 
-@testset "MembershipFilter" begin
-	d = DataFrame(:Ft1 => repeat(["A", "B", "C"], 4),
-                  :Ft2 => 1:12)
+    # Try inverting CombinationFilter and CombinationSelector
+    cf_all = CombinationFilter(f1, nf1, ∪)
+    @test filter_entries(e1, cf_all) == e1.selected_entries
+    cf_none = CombinationFilter(f1, nf1, ∩)
+    @test filter_entries(e1, cf_none) == []
 
-	e = Experiment(d)
+    # De Morgan
+    f2 = Filter(0.5, :Ft1, compare = >)
+    cf_and = negation(CombinationFilter(f1, f2, ∩))
+    cf_or = CombinationFilter(negation(f1), negation(f2), ∪)
+    @test filter_entries(e1, cf_and) == filter_entries(e1, cf_or)
 
-	in_filter = MembershipFilter(("A", "C"), :Ft1)
-	@test length(filter_entries(e, in_filter)) == 8
+    cs_all = CombinationSelector(s1, ns1, ∪)
+    @test select_features(e1, cs_all) == e1.selected_features
+    cs_none = CombinationSelector(s1, ns1, ∩)
+    @test select_features(e1, cs_none) == []
 
-	notB_filter = negation(Filter("B",:Ft1))
-	@test filter_entries(e, in_filter) == filter_entries(e, notB_filter)
+    # De Morgan
+    cs_and = negation(CombinationSelector(s1, s2, ∩))
+    cs_or = CombinationSelector(negation(s1), negation(s2), ∪)
+    @test select_features(e1, cs_and) == select_features(e1, cs_or)    
 
-	in_filter2 = MembershipFilter(["A", "C"], :Ft2)
-	@test length(filter_entries(e, in_filter2)) == 0
+    # Try inverting MembershipFilter
+    mf = MembershipFilter(["Exp2", "Exp3"], :Experiment)
+    @test filter_entries(e1, negation(mf)) == filter_entries(e1, f1)
 end
 
 @testset "getdata" begin
@@ -805,26 +856,7 @@ end
                                                     r_seed = false)
     @test rmpv_run1 == rmpv_run2
 end
-
-@testset "NullFilter" begin
-	d = DataFrame(rand(50,3))
-    rename!(d, [:A, :B, :C])
-	e = Experiment(d)
-
-    nf = NullFilter()
-    @test filter_entries(e, nf) == e.selected_entries
-
-    valf1 = Filter(0.5, :B, compare = >, 
-        description = "Sample some entries")
-
-    filter!(e, valf1)
-    @test filter_entries(e, nf) == e.selected_entries
-
-    valf2 = Filter(0.5, :C, compare = >, 
-        description = "Sample some more entries")
-    combf = CombinationFilter(valf2, nf, ∩)
-    @test filter_entries(e, combf) == filter_entries(e, valf2)
-end  
+ 
     
 @testset "parallel_rmpv" begin
 	"""

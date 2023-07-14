@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Normalization for diagnostic images, to support some potential issues with bit depth.
 
 ### Added
-- MissingFilte
+- NullFilter and NullSelector
+- MissingFilter
 - MembershipFilter
+- Negation for CombinationSelector and CombinationFilter
 
 ## v1.1.1 - 2022-11-30
 ### Changed

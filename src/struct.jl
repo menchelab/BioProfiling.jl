@@ -64,7 +64,7 @@ mutable struct MissingFilter <: AbstractMissingFilter end
 
 # Special filters
 """
-Returns a Filter object excluding rows having missing values
+Return a Filter object excluding rows having missing values
 for a given `feature`.
 """
 function MissingFilter(feature; 
@@ -73,7 +73,7 @@ function MissingFilter(feature;
 end
 
 """
-Returns a Filter object excluding rows in which the values for a  
+Return a Filter object excluding rows in which the values for a  
 given `feature` are elements in `collection` (set membership).
 """
 function MembershipFilter(collection, feature; 
@@ -82,7 +82,7 @@ function MembershipFilter(collection, feature;
 end
 
 """
-Returns a Filter object not excluding any row.
+Return a Filter object not excluding any row.
 """
 function NullFilter(;description = "Keep all entries")
     return NullFilter(description)
@@ -132,6 +132,8 @@ abstract type AbstractSelector <: AbstractReduce end
 abstract type AbstractSimpleSelector <: AbstractSelector end
 abstract type AbstractNameSelector <: AbstractSelector end
 abstract type AbstractCombinationSelector <: AbstractSelector end
+abstract type AbstractNullSelector <: AbstractSelector end
+
 
 mutable struct Selector <: AbstractSimpleSelector
     summarize::Function
@@ -161,6 +163,18 @@ mutable struct CombinationSelector <: AbstractCombinationSelector
     operator::Function
 end
 
+mutable struct NullSelector <: AbstractNullSelector
+    description::String
+end
+
+# Constructor
+"""
+Return a Selector object not excluding any column.
+"""
+function NullSelector(; description = "Keep all selected features")
+    return NullSelector(description)
+end
+
 # Methods
 
 """Return selected features in an Experiment `e` based on selectors `s`
@@ -168,7 +182,7 @@ end
 function select_features(e::AbstractExperiment, s::AbstractSimpleSelector)
     # NB: isnothing was not implemented in 1.0
     if s.subset === nothing
-        data = e.data[e.selected_entries, e.selected_features]
+        data = getdata(e)
     else
         subIndices = s.subset(e.data[e.selected_entries,:])
         data = e.data[e.selected_entries[subIndices], e.selected_features]
@@ -186,6 +200,10 @@ function select_features(e::AbstractExperiment, s::AbstractCombinationSelector)
     f1 = select_features(e, s.selector1)
     f2 = select_features(e, s.selector2)
     return(sort(s.operator(f1, f2)))
+end
+
+function select_features(e::AbstractExperiment, s::AbstractNullSelector)
+    return(e.selected_features)
 end
 
 """Return selected features in an Experiment `e` based on selectors `s`,
@@ -243,18 +261,12 @@ DataFrames.select!(e::AbstractExperiment, f::AbstractFilter) = filter_experiment
 """Return a negative Filter or Selector by inverting 
 the entries or features that are kept and excluded.
 """
-function negation(r::Union{AbstractNameSelector,AbstractSimpleSelector})
-    neg_r = deepcopy(r)
-    neg_r.summarize = !neg_r.summarize
-    neg_r.description = "Do not "*neg_r.description
-    return(neg_r)
+function negation(r::AbstractSelector)
+    return(CombinationSelector(NullSelector(), r, setdiff))
 end
 
-function negation(r::AbstractSimpleFilter)
-    neg_r = deepcopy(r)
-    neg_r.compare = !neg_r.compare
-    neg_r.description = "Do not "*neg_r.description
-    return(neg_r)
+function negation(r::AbstractFilter)
+    return(CombinationFilter(NullFilter(), r, setdiff))
 end
 
 """Return a copy of the data in Experiment `e` for its 
