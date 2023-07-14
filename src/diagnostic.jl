@@ -169,9 +169,11 @@ function getColorImage(R::String, G::String, B::String; normalize = true)
     imgB = load(B);
 
     if normalize
-        imgR ./= maximum(imgR)
-        imgG ./= maximum(imgG)
-        imgB ./= maximum(imgB)
+        # imgR ./= maximum(imgR) does not work
+        # as we need to allow for new color formats
+        imgR = imgR ./ float(maximum(imgR))
+        imgG = imgG ./ float(maximum(imgG))
+        imgB = imgB ./ float(maximum(imgB))
     end
     colorview(RGB, imgR, imgG, imgB)
 end
